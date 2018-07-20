@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from aiohttp import web
 import asyncio
@@ -14,6 +13,7 @@ except:
 
 clients=[] #<- for saving clients cnx
 exposed={} #<- for saving exposed methods
+app = web.Application()
 
 async def as_emit(event,args,exceptMe=None):
     global clients
@@ -62,7 +62,7 @@ async def wshandle(request):
             break
 
     clients.remove( ws )
-
+    # if len(clients)==0: app.loop.stop()
     return ws
 
 ################################################# exposed methods vv
@@ -71,15 +71,14 @@ def expose( f ):
     exposed[f.__name__]=f
     return f
 
-def start():
-    app = web.Application()
+def start(port=8080):
     app.add_routes([
             web.get('/ws', wshandle),
 
             web.get('/', handle),
             web.get('/{path}', handle),
     ])
-    web.run_app(app)
+    web.run_app(app,port=port)
 
 if __name__=="__main__":
     pass
