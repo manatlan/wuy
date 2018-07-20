@@ -66,16 +66,16 @@ async def wshandle(request):
     return ws
 
 ################################################# exposed methods vv
-def expose( f ):
+def expose( f ):    # decorator !
     global exposed
     exposed[f.__name__]=f
     return f
 
-def exit():
+def exit():         # exit method
     app.loop.stop()
     sys.exit()
 
-def start(port=8080):
+def start(port=8080):   # start method
     app.add_routes([
             web.get('/ws', wshandle),
 
