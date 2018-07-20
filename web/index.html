@@ -19,10 +19,9 @@ function event(x) {
     <button onclick="huy.my_python_method2(42).then( rep )">call a py method (which send a event)</button><br/>
     <button onclick="huy.emit('js_event','from JS').then( rep )">send a event to everybody (except me)</button><br/>
 
-    <a href="/test" target="_blank">Test from py</a>
-<script>
-    huy.on("js_event", event )
-</script>
+    <script>
+        huy.on("js_event", event )
+    </script>
 
 
 </body>

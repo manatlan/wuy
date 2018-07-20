@@ -12,3 +12,8 @@ It's like [python eel](https://github.com/ChrisKnott/Eel) BUT :
 * com errors are catch'able thru the promise
 
 it's a proof of concept : HUY means **H**tml **U**ser **Y**nterface ...
+
+## to run
+
+    $ pip3 install aiohttp
+    $ ./server.py
