@@ -1,0 +1,31 @@
+<head>
+<script src="huy.js"></script>
+<script>
+function rep(x) {
+    document.getElementById("rep").innerHTML=x;
+    if(x) setTimeout( ()=>{rep('')},500)
+}
+function event(x) {
+    document.getElementById("event").innerHTML=x;
+    if(x) setTimeout( ()=>{event('')},500)
+}
+</script>
+</head>
+<body>
+    Returned:<span id="rep"></span><br/>
+    Event:<span id="event"></span><br/>
+
+    <button onclick="huy.my_python_method(42,43).then( rep )">test</button>
+
+    <button onclick="huy.my_python_method2(42).then( rep )">test</button>
+
+    <button onclick="huy.emit('js_event','from JS').then( rep )">test</button> <!-- send to everybody, except me -->
+
+    <a href="/test" target="_blank">Test from py</a>
+<script>
+    huy.on("js_event", event )
+</script>
+
+
+</body>
+
