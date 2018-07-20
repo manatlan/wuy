@@ -31,13 +31,13 @@ function setupWS() {
 
 var huy = new Proxy( {
         _ws: setupWS(),
-        on: function( evt, callback ) {
+        on: function( evt, callback ) {     // to register an event on a callback
             document.addEventListener(evt,function(e) { callback(e.detail) })
         },
-        emit: function( evt, data) {
-            return huy.call("emit",evt,data)
+        emit: function( evt, data) {        // to emit a event to all clients (except me), return a promise when done
+            return huy._call("emit",evt,data)
         },
-        call: function( _ ) {
+        _call: function( _ ) {               
             var args=Array.prototype.slice.call(arguments);
 
             var cmd={
@@ -67,7 +67,7 @@ var huy = new Proxy( {
             else
                 return function() {
                     var args=[propKey].concat( Array.prototype.slice.call(arguments) )
-                    return target.call.apply( target, args);
+                    return target._call.apply( target, args);
                 }
         }
     },
