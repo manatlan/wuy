@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", function(event) {
 })
 
-function setupWS() {
+function setupWS( cbCnx ) {
 
     var ws=new WebSocket( window.location.origin.replace("http","ws")+"/ws" );
 
@@ -17,20 +17,20 @@ function setupWS() {
 
     ws.onclose = function(evt) {
         console.log("disconnected");
-        huy._ws = null;
-        setTimeout( setupWS, 1000);
+        cbCnx(null);
+        setTimeout( function() {setupWS(cbCnx)}, 1000);
     };
-    ws.onerror = function(evt) {};
+    ws.onerror = function(evt) {cbCnx(null);};
     ws.onopen=function(evt) {
         console.log("Connected",evt)
-        huy._ws = ws;
+        cbCnx(ws);
     }
 
     return ws;
 }
 
 var huy = new Proxy( {
-        _ws: setupWS(),
+        _ws: setupWS( ws=>{huy._ws = ws} ),
         on: function( evt, callback ) {     // to register an event on a callback
             document.addEventListener(evt,function(e) { callback(e.detail) })
         },

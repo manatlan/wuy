@@ -62,7 +62,7 @@ async def wshandle(request):
             break
 
     clients.remove( ws )
-    # if len(clients)==0: app.loop.stop()
+    # if len(clients)==0: exit()
     return ws
 
 ################################################# exposed methods vv
@@ -70,6 +70,10 @@ def expose( f ):
     global exposed
     exposed[f.__name__]=f
     return f
+
+def exit():
+    app.loop.stop()
+    sys.exit()
 
 def start(port=8080):
     app.add_routes([
