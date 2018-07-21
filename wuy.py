@@ -4,8 +4,9 @@ import asyncio
 import json,sys,os
 import webbrowser
 import traceback
+import uuid
 
-__version__="0.1.2"
+__version__="0.1.3"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -203,7 +204,7 @@ def start(port=8080,app=None):   # start method (app can be True, (width,size), 
         print("Create %s, just edit it" % startpage)
 
     if app:
-        closeIfNoSocket=startApp("http://localhost:%s"%port)
+        closeIfNoSocket=startApp("http://localhost:%s/?%s"% (port,uuid.uuid4().hex))
         if type(app)==tuple and len(app)==2:
             size=app
 
