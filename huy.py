@@ -3,6 +3,7 @@ from aiohttp import web
 import asyncio
 import json,sys,os
 import webbrowser
+import traceback
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -18,11 +19,14 @@ application = web.Application()
 closeIfNoSocket=False
 size=None
 
+def log(*a):
+    print(*a)
+
 async def as_emit(event,args,exceptMe=None):
     global clients
     for ws in clients:
         if id(ws) != id(exceptMe):
-            print("emit event '%s' : %s" % (event,args))
+            log(" < emit event '%s' : %s" % (event,args))
             await ws.send_str( json.dumps( dict(event=event,args=args) ))
 
 def emit(event,args):   # sync version of emit for py side !
@@ -31,11 +35,15 @@ def emit(event,args):   # sync version of emit for py side !
 async def handle(request): # serve all statics from web folder
     file = './web/'+request.match_info.get('path', "index.html")
     if os.path.isfile(file):
+        # log("- serve static file",file)
         return web.FileResponse(file)
     else:
+        # log("! 404 on",file)
         return web.Response(status=404,body="file not found")
 
 async def handleJs(request): # serve the JS
+    global size
+    # log("- serve huy.js",size and ("with size "+str(size)) or "")
     js="""
 document.addEventListener("DOMContentLoaded", function(event) {
     %s
@@ -132,7 +140,7 @@ async def wshandle(request):
         if msg.type == web.WSMsgType.text:
             try:
                 o=json.loads( msg.data )
-                print("RECEPT",o)
+                log("> RECEPT",o)
                 if o["command"] == "emit":
                     event, *args = o["args"]
                     await as_emit( event, args, ws) # emit to everybody except me
@@ -140,11 +148,11 @@ async def wshandle(request):
                 else:
                     r=dict(result = exposed[o["command"]]( *o["args"] ) )
             except Exception as e:
-                r=dict(error = str(e))
+                r=dict(error = str(e), traceback=traceback.format_exc() )
 
             if "uuid" in o: r["uuid"]=o["uuid"]
 
-            print("sent",r)
+            log("< return",r)
             await ws.send_str( json.dumps( r ) )
         elif msg.type == web.WSMsgType.close:
             break
@@ -198,4 +206,4 @@ def start(port=8080,app=None):   # start method (app can be True, (width,size), 
     web.run_app(application,port=port)
 
 if __name__=="__main__":
-    pass
+    log("test",42)
