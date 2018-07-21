@@ -12,8 +12,15 @@ It's like [python eel](https://github.com/ChrisKnott/Eel) BUT :
 
 it's a proof of concept : HUY means **H**tml **U**ser **Y**nterface ...
 
-## to run
+## to test/run
+
+Download a zip from here
 
     $ pip3 install aiohttp
     $ python3 -u server.py
 
+## to use
+
+    $ pip3 install huy
+
+    ...
