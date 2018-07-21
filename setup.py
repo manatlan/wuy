@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name='huy',    
+    name='wuy',    
     version="0.1",
 
     author="manatlan",
@@ -10,7 +10,7 @@ setuptools.setup(
     long_description=open("README.md","r").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/manatlan/reqman",
-    py_modules=["huy"], #setuptools.find_packages(),
+    py_modules=["wuy"], #setuptools.find_packages(),
     classifiers=(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",

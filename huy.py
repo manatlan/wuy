@@ -43,7 +43,7 @@ async def handle(request): # serve all statics from web folder
 
 async def handleJs(request): # serve the JS
     global size
-    # log("- serve huy.js",size and ("with size "+str(size)) or "")
+    # log("- serve wuy.js",size and ("with size "+str(size)) or "")
     js="""
 document.addEventListener("DOMContentLoaded", function(event) {
     %s
@@ -56,7 +56,7 @@ function setupWS( cbCnx ) {
     ws.onmessage = function(evt) {
       var r = JSON.parse(evt.data);
       if(r.uuid) // that's a response from call py !
-          document.dispatchEvent( new CustomEvent('huy-'+r.uuid,{ detail: r} ) );
+          document.dispatchEvent( new CustomEvent('wuy-'+r.uuid,{ detail: r} ) );
       else if(r.event){ // that's an event from anywhere !
           document.dispatchEvent( new CustomEvent(r.event,{ detail: r.args } ) );
       }
@@ -76,13 +76,13 @@ function setupWS( cbCnx ) {
     return ws;
 }
 
-var huy = new Proxy( {
-        _ws: setupWS( ws=>{huy._ws = ws} ),
+var wuy = new Proxy( {
+        _ws: setupWS( ws=>{wuy._ws = ws} ),
         on: function( evt, callback ) {     // to register an event on a callback
             document.addEventListener(evt,function(e) { callback(e.detail) })
         },
         emit: function( evt, data) {        // to emit a event to all clients (except me), return a promise when done
-            return huy._call("emit",evt,data)
+            return wuy._call("emit",evt,data)
         },
         _call: function( _ ) {               
             var args=Array.prototype.slice.call(arguments);
@@ -92,12 +92,12 @@ var huy = new Proxy( {
                 args:       args,
             };
             cmd.uuid = cmd.command+"-"+Math.random().toString(36).substring(2); // stamp the exchange, so the callback can be called back (thru customevent)
-            if(huy._ws) {
-                huy._ws.send( JSON.stringify(cmd) );
+            if(wuy._ws) {
+                wuy._ws.send( JSON.stringify(cmd) );
 
                 return new Promise( function (resolve, reject) {
-                    document.addEventListener('huy-'+cmd.uuid, function handler(x) {
-                        this.removeEventListener('huy-'+cmd.uuid, handler);
+                    document.addEventListener('wuy-'+cmd.uuid, function handler(x) {
+                        this.removeEventListener('wuy-'+cmd.uuid, handler);
                         var x=x.detail;
                         if(x && x.result)
                             resolve(x.result)
@@ -114,7 +114,7 @@ var huy = new Proxy( {
         }
     },
     {
-        get: function(target, propKey, receiver){   // proxy: huy.method(args) ==> huy._call( method, args )
+        get: function(target, propKey, receiver){   // proxy: wuy.method(args) ==> wuy._call( method, args )
             if(target.hasOwnProperty(propKey))
                 return target[propKey];
             else
@@ -200,7 +200,7 @@ def start(port=8080,app=None):   # start method (app can be True, (width,size), 
             web.get('/ws', wshandle),
 
             web.get('/', handle),
-            web.get('/huy.js', handleJs),
+            web.get('/wuy.js', handleJs),
             web.get('/{path}', handle),
     ])
     web.run_app(application,port=port)

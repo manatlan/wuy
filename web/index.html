@@ -1,5 +1,5 @@
 <head>
-<script src="huy.js"></script>
+<script src="wuy.js"></script>
 <script>
 function rep(x) {
     document.getElementById("rep").innerHTML=x;
@@ -15,13 +15,13 @@ function event(x) {
     Returned:<span id="rep"></span><br/>
     Event:<span id="event"></span><br/>
 
-    <button onclick="huy.my_python_method(42,43).then( rep )">call a py method</button><br/>
-    <button onclick="huy.my_python_method2(42).then( rep )">call a py method (which send a event)</button><br/>
-    <button onclick="huy.emit('js_event','from JS').then( rep )">send an event to everybody (except me)</button><br/>
-    <button onclick="huy.my_python_exit()">exit app</button><br/>
+    <button onclick="wuy.my_python_method(42,43).then( rep )">call a py method</button><br/>
+    <button onclick="wuy.my_python_method2(42).then( rep )">call a py method (which send a event)</button><br/>
+    <button onclick="wuy.emit('js_event','from JS').then( rep )">send an event to everybody (except me)</button><br/>
+    <button onclick="wuy.my_python_exit()">exit app</button><br/>
 
     <script>
-        huy.on("js_event", event )
+        wuy.on("js_event", event )
     </script>
 
 

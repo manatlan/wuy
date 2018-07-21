@@ -20,7 +20,7 @@
         {
             "label": "upload to pypi",
             "type": "shell",
-            "command": "/home/manatlan/.local/bin/twine upload dist/huy-*.tar.gz dist/huy-*.whl",
+            "command": "/home/manatlan/.local/bin/twine upload dist/wuy-*.tar.gz dist/wuy-*.whl",
             "problemMatcher": [],
             "presentation": {
                 "panel": "new",

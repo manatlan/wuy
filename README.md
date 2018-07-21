@@ -1,4 +1,4 @@
-# huy (wuy renaming)
+# wuy 
 
 It's like [python eel](https://github.com/ChrisKnott/Eel) BUT :
 
@@ -10,7 +10,7 @@ It's like [python eel](https://github.com/ChrisKnott/Eel) BUT :
 * it's not pyinstaller-friendly for now
 * com errors are catch'able thru the promise
 
-it's a proof of concept : HUY means **H**tml **U**ser **Y**nterface ...
+it's a proof of concept : WUY means **W**eb **U**ser **Y**nterface ...
 
 ## to test/run
 
@@ -21,6 +21,6 @@ Download a zip from here
 
 ## to use
 
-    $ pip3 install huy
+    $ pip3 install wuy
 
     ...
