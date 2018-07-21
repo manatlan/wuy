@@ -3,6 +3,7 @@
     "code-runner.clearPreviousOutput": true,
     "code-runner.executorMap": {
         "python": "/usr/bin/python3 -u",
-    }
+    },
+    "python.linting.pylintEnabled": false
 }
 

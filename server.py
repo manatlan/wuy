@@ -15,5 +15,6 @@ def my_python_exit():
     huy.exit()
 
 if __name__=="__main__":
-    huy.start(app=True) # run a browser & close when no socket
-    # huy.start(app=False) # (default) run as a normal http/ws server
+    huy.start(app=(400,400)) # run a browser & close when no socket & set size of the window
+    # huy.start(app=True)      # run a browser & close when no socket (get back the last size)
+    # huy.start() # (default) run as a normal http/ws server (don't run a browser)
