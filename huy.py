@@ -2,6 +2,7 @@
 from aiohttp import web
 import asyncio
 import json,sys,os
+import webbrowser
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -13,7 +14,8 @@ except:
 
 clients=[] #<- for saving clients cnx
 exposed={} #<- for saving exposed methods
-app = web.Application()
+application = web.Application()
+closeIfNoSocket=False
 
 async def as_emit(event,args,exceptMe=None):
     global clients
@@ -62,8 +64,25 @@ async def wshandle(request):
             break
 
     clients.remove( ws )
-    # if len(clients)==0: exit()
+    if closeIfNoSocket and len(clients)==0: exit()
     return ws
+
+
+def getBro():
+    for b in ['google-chrome','chrome',"chromium","chromium-browser"]:
+        try:
+            i = webbrowser.get(b)
+        except webbrowser.Error:
+            i=None
+
+        if i: return i
+
+def open(url):
+    b=getBro()
+    if b:
+        b._invoke(["--app="+url],1,1)
+        return True
+
 
 ################################################# exposed methods vv
 def expose( f ):    # decorator !
@@ -72,17 +91,22 @@ def expose( f ):    # decorator !
     return f
 
 def exit():         # exit method
-    app.loop.stop()
+    application.loop.stop()
     sys.exit()
 
-def start(port=8080):   # start method
-    app.add_routes([
+def start(port=8080,app=False):   # start method
+    global closeIfNoSocket
+
+    if app:
+        closeIfNoSocket=open("http://localhost:%s"%port)
+
+    application.add_routes([
             web.get('/ws', wshandle),
 
             web.get('/', handle),
             web.get('/{path}', handle),
     ])
-    web.run_app(app,port=port)
+    web.run_app(application,port=port)
 
 if __name__=="__main__":
     pass
