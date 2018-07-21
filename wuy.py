@@ -6,7 +6,7 @@ import webbrowser
 import traceback
 import uuid
 
-__version__="0.1.8"
+__version__="0.2.0"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -73,7 +73,7 @@ function setupWS( cbCnx ) {
     ws.onclose = function(evt) {
         console.log("disconnected");
         cbCnx(null);
-        setTimeout( function() {setupWS(cbCnx)}, 1000);
+        %s
     };
     ws.onerror = function(evt) {cbCnx(null);};
     ws.onopen=function(evt) {
@@ -133,7 +133,13 @@ var wuy = new Proxy( {
         }
     },
 );
-""" % (size and "window.resizeTo(%s,%s);"%(size[0],size[1]) or "",'document.title="%s";'%name)
+""" % (
+        size and "window.resizeTo(%s,%s);"%(size[0],size[1]) or "",
+        'document.title="%s";'%name,
+        closeIfSocketClose and "window.close()" or "setTimeout( function() {setupWS(cbCnx)}, 1000);"
+        
+
+    )
     return web.Response(status=200,text=js)
 
 async def wshandle(request):
