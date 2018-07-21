@@ -1,8 +1,9 @@
+import wuy
 import setuptools
 
 setuptools.setup(
     name='wuy',    
-    version="0.1",
+    version=wuy.__version__,
 
     author="manatlan",
     author_email="manatlan@gmail.com",

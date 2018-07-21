@@ -5,6 +5,8 @@ import json,sys,os
 import webbrowser
 import traceback
 
+__version__="0.1.1"
+
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
 except:
@@ -32,7 +34,7 @@ async def as_emit(event,args,exceptMe=None):
 def emit(event,args):   # sync version of emit for py side !
     asyncio.ensure_future( as_emit( event, args) )
 
-async def handle(request): # serve all statics from web folder
+async def handleWeb(request): # serve all statics from web folder
     file = './web/'+request.match_info.get('path', "index.html")
     if os.path.isfile(file):
         # log("- serve static file",file)
@@ -130,7 +132,6 @@ var wuy = new Proxy( {
 
 async def wshandle(request):
     global clients
-
     ws = web.WebSocketResponse()
     await ws.prepare(request)
 
@@ -171,7 +172,7 @@ def getBro():
 
         if i: return i
 
-def open(url):
+def startApp(url):
     b=getBro()
     if b:
         b._invoke(["--app="+url],1,1)
@@ -191,17 +192,28 @@ def exit():         # exit method
 def start(port=8080,app=None):   # start method (app can be True, (width,size), ...)
     global closeIfNoSocket,size
 
+    # create startpage if not present
+    startpage="./web/index.html"
+    if not os.path.isfile(startpage):
+        if not os.path.isdir(os.path.dirname(startpage)):
+            os.makedirs(os.path.dirname(startpage),755)
+        with open(startpage,"w+") as fid:
+            fid.write('''<script src="wuy.js"></script>\n''')
+            fid.write('''Hello Wuy'rld ;-)''')
+        print("Create %s, just edit it" % startpage)
+
     if app:
-        closeIfNoSocket=open("http://localhost:%s"%port)
+        closeIfNoSocket=startApp("http://localhost:%s"%port)
         if type(app)==tuple and len(app)==2:
             size=app
 
     application.add_routes([
             web.get('/ws', wshandle),
 
-            web.get('/', handle),
             web.get('/wuy.js', handleJs),
-            web.get('/{path}', handle),
+
+            web.get('/', handleWeb),
+            web.get('/{path}', handleWeb),
     ])
     web.run_app(application,port=port)
 
