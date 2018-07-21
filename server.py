@@ -16,6 +16,5 @@ def my_python_exit():
 
 if __name__=="__main__":
     wuy.start(app=(400,200)) # run a browser & close when no socket & set size of the window
-    wuy.start(app=(400,200)) # run a browser & close when no socket & set size of the window
     # wuy.start(app=True)      # run a browser & close when no socket (get back the last size)
     # wuy.start() # (default) run as a normal http/ws server (don't run a browser)
