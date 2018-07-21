@@ -6,7 +6,7 @@ import webbrowser
 import traceback
 import uuid
 
-__version__="0.1.5"
+__version__="0.1.6"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -170,18 +170,19 @@ async def wshandle(request):
 
 
 def getBro():
-    for b in ['google-chrome','chrome',"chromium","chromium-browser"]:
+    for b in ['google-chrome','chrome',"chromium","chromium-browser","mozilla","firefox"]:
         try:
-            i = webbrowser.get(b)
+            return webbrowser.get(b)
         except webbrowser.Error:
-            i=None
-
-        if i: return i
+            pass
 
 def startApp(url):
     b=getBro()
     if b:
-        b._invoke(["--app="+url],1,1)
+        if "mozilla" in str(b).lower():
+            b._invoke(["--new-window",url],0,0) #window.close() won't work ;-(
+        else:
+            b._invoke(["--app="+url],1,1)
         return True
 
 
