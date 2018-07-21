@@ -5,7 +5,7 @@ import json,sys,os
 import webbrowser
 import traceback
 
-__version__="0.1.1"
+__version__="0.1.2"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -196,7 +196,7 @@ def start(port=8080,app=None):   # start method (app can be True, (width,size), 
     startpage="./web/index.html"
     if not os.path.isfile(startpage):
         if not os.path.isdir(os.path.dirname(startpage)):
-            os.makedirs(os.path.dirname(startpage),755)
+            os.makedirs(os.path.dirname(startpage))
         with open(startpage,"w+") as fid:
             fid.write('''<script src="wuy.js"></script>\n''')
             fid.write('''Hello Wuy'rld ;-)''')
