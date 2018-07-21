@@ -1,4 +1,4 @@
-# huy (wuy)
+# huy (wuy renaming)
 
 It's like [python eel](https://github.com/ChrisKnott/Eel) BUT :
 
