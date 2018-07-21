@@ -10,7 +10,7 @@ setuptools.setup(
     description="Like python eel, but for py3, with asyncio",
     long_description=open("README.md","r").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/manatlan/reqman",
+    url="https://github.com/manatlan/wuy",
     py_modules=["wuy"], #setuptools.find_packages(),
     classifiers=(
         "Programming Language :: Python :: 3",

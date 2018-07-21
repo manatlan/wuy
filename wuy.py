@@ -6,7 +6,7 @@ import webbrowser
 import traceback
 import uuid
 
-__version__="0.1.3"
+__version__="0.1.4"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
