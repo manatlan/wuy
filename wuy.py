@@ -5,9 +5,8 @@ import json,sys,os
 import webbrowser
 import traceback
 import uuid
-import contextlib
 
-__version__="0.1.7"
+__version__="0.1.8"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -166,8 +165,6 @@ async def wshandle(request):
             break
 
     clients.remove( ws )
-    # for i in clients:
-    #     print(dir(i))
     if closeIfSocketClose: exit()
     return ws
 
@@ -196,13 +193,21 @@ def expose( f ):    # decorator !
     return f
 
 def exit():         # exit method
+
+    async def handle_exception(task):
+        try:
+            await task.cancel()
+        except Exception:
+            pass
+
     for task in asyncio.Task.all_tasks():
-        task.cancel()
+        asyncio.ensure_future(handle_exception(task))
 
     loop = asyncio.get_event_loop()
     loop.stop()
     
     asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are possibles
+    log("exit")
 
 def start(port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
     global closeIfSocketClose,size,isLog
