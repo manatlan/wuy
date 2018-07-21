@@ -236,7 +236,10 @@ def start(port=8080,app=None,log=True):   # start method (app can be True, (widt
             web.get('/', handleWeb),
             web.get('/{path}', handleWeb),
     ])
-    web.run_app(application,port=port)
+    try:
+        web.run_app(application,port=port)
+    except KeyboardInterrupt:
+        exit()
 
 if __name__=="__main__":
     log("test",42)
