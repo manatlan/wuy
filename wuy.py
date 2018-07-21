@@ -5,8 +5,9 @@ import json,sys,os
 import webbrowser
 import traceback
 import uuid
+import contextlib
 
-__version__="0.1.6"
+__version__="0.1.7"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -18,8 +19,8 @@ except:
 
 clients=[] #<- for saving clients cnx
 exposed={} #<- for saving exposed methods
-application = web.Application()
-closeIfNoSocket=False
+application = None
+closeIfSocketClose=False
 size=None
 isLog=True
 
@@ -165,7 +166,9 @@ async def wshandle(request):
             break
 
     clients.remove( ws )
-    if closeIfNoSocket and len(clients)==0: exit()
+    # for i in clients:
+    #     print(dir(i))
+    if closeIfSocketClose: exit()
     return ws
 
 
@@ -193,11 +196,16 @@ def expose( f ):    # decorator !
     return f
 
 def exit():         # exit method
-    application.loop.stop()
-    sys.exit()
+    for task in asyncio.Task.all_tasks():
+        task.cancel()
+
+    loop = asyncio.get_event_loop()
+    loop.stop()
+    
+    asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are possibles
 
 def start(port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
-    global closeIfNoSocket,size,isLog
+    global closeIfSocketClose,size,isLog
     isLog=log
 
     # create startpage if not present
@@ -211,10 +219,11 @@ def start(port=8080,app=None,log=True):   # start method (app can be True, (widt
         print("Create %s, just edit it" % startpage)
 
     if app:
-        closeIfNoSocket=startApp("http://localhost:%s/?%s"% (port,uuid.uuid4().hex))
+        closeIfSocketClose=startApp("http://localhost:%s/?%s"% (port,uuid.uuid4().hex))
         if type(app)==tuple and len(app)==2:
             size=app
 
+    application=web.Application()
     application.add_routes([
             web.get('/ws', wshandle),
 
