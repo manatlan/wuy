@@ -16,3 +16,4 @@ it's a proof of concept : HUY means **H**tml **U**ser **Y**nterface ...
 
     $ pip3 install aiohttp
     $ python3 -u server.py
+
