@@ -6,7 +6,7 @@ import webbrowser
 import traceback
 import uuid
 
-__version__="0.1.4"
+__version__="0.1.5"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -21,15 +21,16 @@ exposed={} #<- for saving exposed methods
 application = web.Application()
 closeIfNoSocket=False
 size=None
+isLog=True
 
 def log(*a):
-    print(*a)
+    if isLog: print(*a)
 
 async def as_emit(event,args,exceptMe=None):
     global clients
     for ws in clients:
         if id(ws) != id(exceptMe):
-            log(" < emit event '%s' : %s" % (event,args))
+            log("  < emit event '%s' : %s" % (event,args))
             await ws.send_str( json.dumps( dict(event=event,args=args) ))
 
 def emit(event,args):   # sync version of emit for py side !
@@ -38,17 +39,21 @@ def emit(event,args):   # sync version of emit for py side !
 async def handleWeb(request): # serve all statics from web folder
     file = './web/'+request.match_info.get('path', "index.html")
     if os.path.isfile(file):
-        # log("- serve static file",file)
+        log("- serve static file",file)
         return web.FileResponse(file)
     else:
-        # log("! 404 on",file)
+        log("! 404 on",file)
         return web.Response(status=404,body="file not found")
 
 async def handleJs(request): # serve the JS
     global size
-    # log("- serve wuy.js",size and ("with size "+str(size)) or "")
+    log("- serve wuy.js",size and ("(with resize to "+str(size)+")") or "")
+
+    name=os.path.basename(sys.argv[0])
+    if "." in name: name=name.split(".")[0]
     js="""
 document.addEventListener("DOMContentLoaded", function(event) {
+    %s
     %s
 },true)
 
@@ -128,7 +133,7 @@ var wuy = new Proxy( {
         }
     },
 );
-""" % (size and "window.resizeTo(%s,%s);"%(size[0],size[1]) or "")
+""" % (size and "window.resizeTo(%s,%s);"%(size[0],size[1]) or "",'document.title="%s";'%name)
     return web.Response(status=200,text=js)
 
 async def wshandle(request):
@@ -190,8 +195,9 @@ def exit():         # exit method
     application.loop.stop()
     sys.exit()
 
-def start(port=8080,app=None):   # start method (app can be True, (width,size), ...)
-    global closeIfNoSocket,size
+def start(port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
+    global closeIfNoSocket,size,isLog
+    isLog=log
 
     # create startpage if not present
     startpage="./web/index.html"
