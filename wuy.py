@@ -203,10 +203,9 @@ def exit():         # exit method
     for task in asyncio.Task.all_tasks():
         asyncio.ensure_future(handle_exception(task))
 
-    loop = asyncio.get_event_loop()
-    loop.stop()
-    
-    asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are possibles
+    asyncio.get_event_loop().stop()
+    asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
+
     log("exit")
 
 def start(port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
