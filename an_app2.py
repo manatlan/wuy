@@ -14,7 +14,7 @@ class askName(wuy.Window):    # name the class as the web/<class_name>.html
             self.exit()
 
 if __name__=="__main__":
-    x=askName()
+    x=askName(port=8888)
     if x.name:
         print("Your name is '%s' !!!" % x.name)
     else:

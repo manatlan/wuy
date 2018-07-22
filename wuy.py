@@ -8,7 +8,7 @@ import uuid
 import inspect
 import types
 
-__version__="0.3"
+__version__="0.3+"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -274,17 +274,17 @@ class Base:
 
 class Window(Base):
     size=True   # or a tuple (wx,wy)
-    def __init__(self):
+    def __init__(self,port=8080,log=True):
         super().__init__(self)
-        self._run(app=self.size)
+        self._run(app=self.size,port=port,log=log)
 
     def exit(self): # exit is available for Window !!
         exit()
 
 class Server(Base):
     def __init__(self):
-        super().__init__(self)
-        self._run(app=False)
+        super().__init__(self,port=8080,log=True)
+        self._run(app=False,port=port,log=log)
 
 
 def start(page="index",port=8080,app=None,log=True):
