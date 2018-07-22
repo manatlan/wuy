@@ -187,9 +187,10 @@ def startApp(url):
 
 
 ################################################# 
+exposed={}
 def expose( f ):    # decorator !
-    global current
-    current._routes[f.__name__]=f
+    global exposed
+    exposed[f.__name__]=f
     return f
 
 def exit():         # exit method
@@ -214,69 +215,77 @@ class Base:
     _closeIfSocketClose=False
     _isLog=False
     _size=None
-    def __init__(self,instance,size):
-        self._name=instance.__class__.__name__
-        self._routes={n:v for n, v in inspect.getmembers(instance, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self._name in str(v)}  #  TODO: there should be a better way to discover class methos
-        run(self,app=size)
+    def __init__(self,instance,exposed={}):
+        if isinstance(instance,Base):
+            self._name=instance.__class__.__name__
+            self._routes={n:v for n, v in inspect.getmembers(instance, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self._name in str(v)}  #  TODO: there should be a better way to discover class methos
+        else: # old style (eel))
+            self._name=instance # aka page name
+            self._routes=exposed
+
+    def run(self,port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
+        global current
+        current=self    # set current !
+
+        self._isLog=log
+
+        page=self._name+".html"
+
+        # create startpage if not present
+        startpage="./web/"+page
+        if not os.path.isfile(startpage):
+            if not os.path.isdir(os.path.dirname(startpage)):
+                os.makedirs(os.path.dirname(startpage))
+            with open(startpage,"w+") as fid:
+                fid.write('''<script src="wuy.js"></script>\n''')
+                fid.write('''Hello Wuy'rld ;-)''')
+            print("Create %s, just edit it" % startpage)
+
+        if app:
+            self._closeIfSocketClose=startApp("http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex))
+            if type(app)==tuple and len(app)==2:
+                self._size=app
+
+        application=web.Application()
+        application.add_routes([
+                web.get('/ws', wshandle),
+
+                web.get('/wuy.js', handleJs),
+
+                web.get('/', handleWeb),
+                web.get('/{path}', handleWeb),
+        ])
+        try:
+            web.run_app(application,port=port)
+        except KeyboardInterrupt:
+            exit()
+
 
     def emit(self,*a,**k):  # emit available for all
         emit(*a,**k)
+
 
 current=Base
 
 class Window(Base):
     size=True
     def __init__(self):
-        super().__init__(self,self.size)
+        super().__init__(self)
+        self.run(app=self.size)
 
     def exit(self): # exit is available for Window !!
         exit()
 
 class Server(Base):
     def __init__(self):
-        super().__init__(self,False)
+        super().__init__(self)
+        self.run(app=False)
 
 
 def start(page="index",port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
-    Base._name=page
-    run(Base,port=port,app=app,log=log)
+    b=Base(page,exposed)
+    b.run(port=port,app=app,log=log)
 
-# the future replacement of start()
-def run(instance,port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
-    global current
-    current._isLog=log
-
-    page=instance._name+".html"
-    current=instance
-
-    # create startpage if not present
-    startpage="./web/"+page
-    if not os.path.isfile(startpage):
-        if not os.path.isdir(os.path.dirname(startpage)):
-            os.makedirs(os.path.dirname(startpage))
-        with open(startpage,"w+") as fid:
-            fid.write('''<script src="wuy.js"></script>\n''')
-            fid.write('''Hello Wuy'rld ;-)''')
-        print("Create %s, just edit it" % startpage)
-
-    if app:
-        current._closeIfSocketClose=startApp("http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex))
-        if type(app)==tuple and len(app)==2:
-            current._size=app
-
-    application=web.Application()
-    application.add_routes([
-            web.get('/ws', wshandle),
-
-            web.get('/wuy.js', handleJs),
-
-            web.get('/', handleWeb),
-            web.get('/{path}', handleWeb),
-    ])
-    try:
-        web.run_app(application,port=port)
-    except KeyboardInterrupt:
-        exit()
 
 if __name__=="__main__":
     log("test",42)
