@@ -2,6 +2,7 @@
 import wuy
 
 # it's the future ... (the server never ends or open a browser)
+# a simple tchat for many clients
 
 class tchat(wuy.Server):    # name the class as the web/<class_name>.html
     

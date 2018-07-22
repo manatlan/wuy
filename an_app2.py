@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import wuy
 
-# it's the future ... (same as simple.py, but with class app concept)
+# it's the future ... (just ask name and return it)
 
 class askName(wuy.Window):    # name the class as the web/<class_name>.html
     size=(200,200)
