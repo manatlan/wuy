@@ -1,0 +1,19 @@
+<script src="wuy.js"></script>
+
+<script>
+function rep(x) {
+    document.getElementById("rep").innerHTML="<li>"+x+"</li>"+document.getElementById("rep").innerHTML;
+}
+</script>
+</head>
+<body>
+
+<button onclick="wuy.doSyncQuick().then(rep)">s quick</button>
+<button onclick="wuy.doSyncLong().then(rep)">s long</button>
+<button onclick="wuy.doASyncLong().then(rep)">as long</button>
+
+<script>
+    wuy.on("event", rep )    
+</script>
+
+Returned:<span id="rep"></span><br/>

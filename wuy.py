@@ -23,7 +23,7 @@ import uuid
 import inspect
 import types
 
-__version__="0.3.3"
+__version__="0.3.4"
 DEFAULT_PORT=8080
 
 current=None    # the current instance of Base
@@ -202,7 +202,10 @@ async def wshandle(request):
                     await as_emit( event, args, ws) # emit to everybody except me
                     r=dict(result = args)           # but return the same content sended, thru the promise
                 else:
-                    r=dict(result = current._routes[ o["command"]]( *o["args"] ) )
+                    ret=current._routes[ o["command"]]( *o["args"] )
+                    if "coroutine" in str(type(ret)):
+                        ret=await ret
+                    r=dict(result = ret )
             except Exception as e:
                 r=dict(error = str(e)) 
                 print("="*79)
