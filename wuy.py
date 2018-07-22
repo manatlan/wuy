@@ -23,15 +23,8 @@ import uuid
 import inspect
 import types
 
-__version__="0.3.2"
-
-try:
-    os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
-except:
-    try:
-        os.chdir(os.path.split(sys.argv[0])[0])
-    except:
-        pass
+__version__="0.3.3"
+DEFAULT_PORT=8080
 
 current=None    # the current instance of Base
 
@@ -42,6 +35,12 @@ def expose( f ):    # decorator !
     global exposed
     exposed[f.__name__]=f
     return f
+
+def path(f):
+    if hasattr(sys,"_MEIPASS"): # when freezed with pyinstaller ;-)
+        return os.path.join(sys._MEIPASS,f)  
+    else:
+        return f
 
 def log(*a):
     if current._isLog: print(*a)
@@ -77,7 +76,7 @@ def emit(event,args):   # sync version of emit for py side !
     asyncio.ensure_future( as_emit( event, args) )
 
 async def handleWeb(request): # serve all statics from web folder
-    file = './web/'+request.match_info.get('path', "index.html")
+    file = path('./web/'+request.match_info.get('path', "index.html"))
     if os.path.isfile(file):
         log("- serve static file",file)
         return web.FileResponse(file)
@@ -254,6 +253,12 @@ class Base:
             self._routes=exposed
 
     def _run(self,port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
+
+        try:
+            os.chdir(os.path.split(sys.argv[0])[0])
+        except:
+            pass
+
         global current
         current=self    # set current !
 
@@ -264,14 +269,14 @@ class Base:
         page=self._name+".html"
 
         # create startpage if not present
-        startpage="./web/"+page
+        startpage=path("./web/"+page)
         if not os.path.isfile(startpage):
             if not os.path.isdir(os.path.dirname(startpage)):
                 os.makedirs(os.path.dirname(startpage))
             with open(startpage,"w+") as fid:
                 fid.write('''<script src="wuy.js"></script>\n''')
                 fid.write('''Hello Wuy'rld ;-)''')
-            print("Create %s, just edit it" % startpage)
+            print("Create 'web/%s', just edit it" % os.path.basename(startpage))
 
         if app:
             self._closeIfSocketClose=startApp("http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex))
@@ -280,27 +285,23 @@ class Base:
 
         application=web.Application( loop=asyncio.get_event_loop() )
         application.add_routes([
-                web.get('/ws', wshandle),
-
-                web.get('/wuy.js', handleJs),
-
-                web.get('/', handleWeb),
-                web.get('/{path}', handleWeb),
+            web.get('/ws',      wshandle),
+            web.get('/wuy.js',  handleJs),
+            web.get('/',        handleWeb),
+            web.get('/{path}',  handleWeb),
         ])
         try:
             web.run_app(application,port=port)
         except KeyboardInterrupt:
             exit()
 
-
     def emit(self,*a,**k):  # emit available for all
         emit(*a,**k)
 
 
-
 class Window(Base):
     size=True   # or a tuple (wx,wy)
-    def __init__(self,port=8080,log=True,**kwargs):
+    def __init__(self,port=DEFAULT_PORT,log=True,**kwargs):
         super().__init__(self)
         self.__dict__.update(kwargs)
         self._kwargs=kwargs
@@ -310,14 +311,14 @@ class Window(Base):
         exit()
 
 class Server(Base):
-    def __init__(self):
-        super().__init__(self,port=8080,log=True,**kwargs)
+    def __init__(self,port=DEFAULT_PORT,log=True,**kwargs):
+        super().__init__(self)
         self.__dict__.update(kwargs)
         self._kwargs=kwargs
         self._run(app=False,port=port,log=log)
 
 
-def start(page="index",port=8080,app=None,log=True):
+def start(page="index",port=DEFAULT_PORT,app=None,log=True):
     """ old style run with exposed methods (like eel) 
             'app' can be True, (width,size) (for window-like(app))            
             'app' can be None, False (for server-like)
