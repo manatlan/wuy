@@ -18,19 +18,12 @@ except:
     except:
         pass
 
-clients=[] #<- for saving clients cnx
-exposed={} #<- for saving exposed methods
-application = None
-closeIfSocketClose=False
-size=None
-isLog=True
-
 def log(*a):
-    if isLog: print(*a)
+    if current._isLog: print(*a)
 
 async def as_emit(event,args,exceptMe=None):
-    global clients
-    for ws in clients:
+    global current
+    for ws in current._clients:
         if id(ws) != id(exceptMe):
             log("  < emit event '%s' : %s" % (event,args))
             await ws.send_str( json.dumps( dict(event=event,args=args) ))
@@ -48,8 +41,7 @@ async def handleWeb(request): # serve all statics from web folder
         return web.Response(status=404,body="file not found")
 
 async def handleJs(request): # serve the JS
-    global size
-    log("- serve wuy.js",size and ("(with resize to "+str(size)+")") or "")
+    log("- serve wuy.js",current._size and ("(with resize to "+str(current._size)+")") or "")
 
     name=os.path.basename(sys.argv[0])
     if "." in name: name=name.split(".")[0]
@@ -136,20 +128,20 @@ var wuy = new Proxy( {
     },
 );
 """ % (
-        size and "window.resizeTo(%s,%s);"%(size[0],size[1]) or "",
+        current._size and "window.resizeTo(%s,%s);"%(current._size[0],current._size[1]) or "",
         'document.title="%s";'%name,
-        closeIfSocketClose and "window.close()" or "setTimeout( function() {setupWS(cbCnx)}, 1000);"
+        current._closeIfSocketClose and "window.close()" or "setTimeout( function() {setupWS(cbCnx)}, 1000);"
         
 
     )
     return web.Response(status=200,text=js)
 
 async def wshandle(request):
-    global clients
+    global current
     ws = web.WebSocketResponse()
     await ws.prepare(request)
 
-    clients.append(ws)
+    current._clients.append(ws)
 
     async for msg in ws:
         if msg.type == web.WSMsgType.text:
@@ -161,7 +153,7 @@ async def wshandle(request):
                     await as_emit( event, args, ws) # emit to everybody except me
                     r=dict(result = args)           # but return the same content sended, thru the promise
                 else:
-                    r=dict(result = exposed[o["command"]]( *o["args"] ) )
+                    r=dict(result = current._routes[ o["command"]]( *o["args"] ) )
             except Exception as e:
                 r=dict(error = str(e), traceback=traceback.format_exc() )
 
@@ -172,8 +164,8 @@ async def wshandle(request):
         elif msg.type == web.WSMsgType.close:
             break
 
-    clients.remove( ws )
-    if closeIfSocketClose: exit()
+    current._clients.remove( ws )
+    if current._closeIfSocketClose: exit()
     return ws
 
 
@@ -194,10 +186,10 @@ def startApp(url):
         return True
 
 
-################################################# exposed methods vv
+################################################# 
 def expose( f ):    # decorator !
-    global exposed
-    exposed[f.__name__]=f
+    global current
+    current._routes[f.__name__]=f
     return f
 
 def exit():         # exit method
@@ -217,16 +209,20 @@ def exit():         # exit method
     log("exit")
 
 class Base:
+    _routes={}
+    _clients=[]
+    _closeIfSocketClose=False
+    _isLog=False
+    _size=None
     def __init__(self,instance,size):
-        global exposed
-        page=instance.__class__.__name__
-        d={n:v for n, v in inspect.getmembers(instance, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%page in str(v)}  #  TODO: there should be a better way to discover class methos
-        exposed=d
-        start(page+".html",app=size)
+        self._name=instance.__class__.__name__
+        self._routes={n:v for n, v in inspect.getmembers(instance, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self._name in str(v)}  #  TODO: there should be a better way to discover class methos
+        run(self,app=size)
 
     def emit(self,*a,**k):  # emit available for all
         emit(*a,**k)
 
+current=Base
 
 class Window(Base):
     size=True
@@ -241,9 +237,17 @@ class Server(Base):
         super().__init__(self,False)
 
 
-def start(page="index.html",port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
-    global closeIfSocketClose,size,isLog
-    isLog=log
+def start(page="index",port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
+    Base._name=page
+    run(Base,port=port,app=app,log=log)
+
+# the future replacement of start()
+def run(instance,port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
+    global current
+    current._isLog=log
+
+    page=instance._name+".html"
+    current=instance
 
     # create startpage if not present
     startpage="./web/"+page
@@ -256,9 +260,9 @@ def start(page="index.html",port=8080,app=None,log=True):   # start method (app 
         print("Create %s, just edit it" % startpage)
 
     if app:
-        closeIfSocketClose=startApp("http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex))
+        current._closeIfSocketClose=startApp("http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex))
         if type(app)==tuple and len(app)==2:
-            size=app
+            current._size=app
 
     application=web.Application()
     application.add_routes([
