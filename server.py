@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import wuy
 
+# like eel (old fashion way, using decorators)
+# but it's still the main way (the historic way)! (see server2.py)
+
 @wuy.expose
 def my_python_method(a,b):
     return a+b

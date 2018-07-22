@@ -5,8 +5,10 @@ import json,sys,os
 import webbrowser
 import traceback
 import uuid
+import inspect
+import types
 
-__version__="0.2.0"
+__version__="0.2.0+"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -214,12 +216,24 @@ def exit():         # exit method
 
     log("exit")
 
-def start(port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
+class Window:
+    def __init__(self):
+        global exposed
+        page=self.__class__.__name__
+        d={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%page in str(v)}  #  TODO: there should be a better way to discover class methos
+        exposed=d
+        start(page+".html",app=(640,480))
+    def emit(self,*a,**k):
+        emit(*a,**k)
+    def exit(self):
+        exit()
+
+def start(page="index.html",port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
     global closeIfSocketClose,size,isLog
     isLog=log
 
     # create startpage if not present
-    startpage="./web/index.html"
+    startpage="./web/"+page
     if not os.path.isfile(startpage):
         if not os.path.isdir(os.path.dirname(startpage)):
             os.makedirs(os.path.dirname(startpage))
@@ -229,7 +243,7 @@ def start(port=8080,app=None,log=True):   # start method (app can be True, (widt
         print("Create %s, just edit it" % startpage)
 
     if app:
-        closeIfSocketClose=startApp("http://localhost:%s/?%s"% (port,uuid.uuid4().hex))
+        closeIfSocketClose=startApp("http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex))
         if type(app)==tuple and len(app)==2:
             size=app
 
