@@ -216,28 +216,29 @@ def exit():         # exit method
 
     log("exit")
 
-class Window:
+class Base:
+    def __init__(self,instance,size):
+        global exposed
+        page=instance.__class__.__name__
+        d={n:v for n, v in inspect.getmembers(instance, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%page in str(v)}  #  TODO: there should be a better way to discover class methos
+        exposed=d
+        start(page+".html",app=size)
+
+    def emit(self,*a,**k):  # emit available for all
+        emit(*a,**k)
+
+
+class Window(Base):
     size=True
     def __init__(self):
-        global exposed
-        page=self.__class__.__name__
-        d={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%page in str(v)}  #  TODO: there should be a better way to discover class methos
-        exposed=d
-        start(page+".html",app=self.size)
-    def emit(self,*a,**k):
-        emit(*a,**k)
-    def exit(self):
+        super().__init__(self,self.size)
+
+    def exit(self): # exit is available for Window !!
         exit()
 
-class Server:
+class Server(Base):
     def __init__(self):
-        global exposed
-        page=self.__class__.__name__
-        d={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%page in str(v)}  #  TODO: there should be a better way to discover class methos
-        exposed=d
-        start(page+".html",app=False)
-    def emit(self,*a,**k):
-        emit(*a,**k)
+        super().__init__(self,False)
 
 
 def start(page="index.html",port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
