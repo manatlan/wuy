@@ -8,7 +8,7 @@ import uuid
 import inspect
 import types
 
-__version__="0.2.1"
+__version__="0.3"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -18,9 +18,39 @@ except:
     except:
         pass
 
+current=None    # the current instance of Base
+
+# helpers
+#############################################################
+exposed={}
+def expose( f ):    # decorator !
+    global exposed
+    exposed[f.__name__]=f
+    return f
+
 def log(*a):
     if current._isLog: print(*a)
 
+def getBrowser():
+    for b in ['google-chrome','chrome',"chromium","chromium-browser","mozilla","firefox"]:
+        try:
+            return webbrowser.get(b)
+        except webbrowser.Error:
+            pass
+
+def startApp(url):
+    b=getBrowser()
+    if b:
+        if "mozilla" in str(b).lower():
+            b._invoke(["--new-window",url],0,0) #window.close() won't work ;-(
+        else:
+            b._invoke(["--app="+url],1,1)
+        return True
+
+
+
+# Async aiohttp things (use current)
+#############################################################
 async def as_emit(event,args,exceptMe=None):
     global current
     for ws in current._clients:
@@ -168,33 +198,7 @@ async def wshandle(request):
     if current._closeIfSocketClose: exit()
     return ws
 
-
-def getBro():
-    for b in ['google-chrome','chrome',"chromium","chromium-browser","mozilla","firefox"]:
-        try:
-            return webbrowser.get(b)
-        except webbrowser.Error:
-            pass
-
-def startApp(url):
-    b=getBro()
-    if b:
-        if "mozilla" in str(b).lower():
-            b._invoke(["--new-window",url],0,0) #window.close() won't work ;-(
-        else:
-            b._invoke(["--app="+url],1,1)
-        return True
-
-
-################################################# 
-exposed={}
-def expose( f ):    # decorator !
-    global exposed
-    exposed[f.__name__]=f
-    return f
-
 def exit():         # exit method
-
     async def handle_exception(task):
         try:
             await task.cancel()
@@ -209,6 +213,8 @@ def exit():         # exit method
 
     log("exit")
 
+# WUY routines
+#############################################################
 class Base:
     _routes={}
     _clients=[]
@@ -223,7 +229,7 @@ class Base:
             self._name=instance # aka page name
             self._routes=exposed
 
-    def run(self,port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
+    def _run(self,port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
         global current
         current=self    # set current !
 
@@ -265,13 +271,12 @@ class Base:
         emit(*a,**k)
 
 
-current=Base
 
 class Window(Base):
-    size=True
+    size=True   # or a tuple (wx,wy)
     def __init__(self):
         super().__init__(self)
-        self.run(app=self.size)
+        self._run(app=self.size)
 
     def exit(self): # exit is available for Window !!
         exit()
@@ -279,12 +284,16 @@ class Window(Base):
 class Server(Base):
     def __init__(self):
         super().__init__(self)
-        self.run(app=False)
+        self._run(app=False)
 
 
-def start(page="index",port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
+def start(page="index",port=8080,app=None,log=True):
+    """ old style run with exposed methods (like eel) 
+            'app' can be True, (width,size) (for window-like(app))            
+            'app' can be None, False (for server-like)
+    """
     b=Base(page,exposed)
-    b.run(port=port,app=app,log=log)
+    b._run(port=port,app=app,log=log)
 
 
 if __name__=="__main__":
