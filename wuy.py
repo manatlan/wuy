@@ -252,7 +252,7 @@ class Base:
             self._name=instance # aka page name
             self._routes=exposed
 
-    def _run(self,port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
+    def _run(self,port=DEFAULT_PORT,app=None,log=True):   # start method (app can be True, (width,size), ...)
 
         try:
             os.chdir(os.path.split(sys.argv[0])[0])
