@@ -8,7 +8,7 @@ import uuid
 import inspect
 import types
 
-__version__="0.3.1"
+__version__="0.3.1+"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -229,7 +229,7 @@ class Base:
     _closeIfSocketClose=False
     _isLog=False
     _size=None
-    _kwargs={}  # Window only
+    _kwargs={}  # Window/Server only
     def __init__(self,instance,exposed={}):
         if isinstance(instance,Base):
             self._name=instance.__class__.__name__
@@ -296,7 +296,9 @@ class Window(Base):
 
 class Server(Base):
     def __init__(self):
-        super().__init__(self,port=8080,log=True)
+        super().__init__(self,port=8080,log=True,**kwargs)
+        self.__dict__.update(kwargs)
+        self._kwargs=kwargs
         self._run(app=False,port=port,log=log)
 
 

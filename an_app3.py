@@ -10,5 +10,5 @@ class alert(wuy.Window):    # name the class as the web/<class_name>.html
         self.exit()
 
 if __name__=="__main__":
-    alert(port=8001,msg="Tintin")
-    alert(port=8002,msg="Milou")
+    alert(msg="Tintin")
+    alert(msg="Milou")
