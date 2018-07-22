@@ -56,3 +56,16 @@ and rerun your script :
     python3 web.py
 
 and you can start to code
+
+## but the future is ... bright ;-)
+
+See examples :
+
+* [an_app](https://github.com/manatlan/wuy/blob/master/an_app.py)
+* [an_app2](https://github.com/manatlan/wuy/blob/master/an_app2.py)
+* [a_server](https://github.com/manatlan/wuy/blob/master/a_server.py)
+
+with **wuy.Window** for app (which open/manage a chrome window app)
+
+with **wuy.Server** for classic http/ws servers
+
