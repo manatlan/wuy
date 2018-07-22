@@ -8,7 +8,7 @@ import uuid
 import inspect
 import types
 
-__version__="0.3+"
+__version__="0.3.1"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
@@ -164,6 +164,11 @@ var wuy = new Proxy( {
         
 
     )
+
+
+    if current._kwargs:
+        for k,v in current._kwargs.items():
+            js+="""\n%s=JSON.parse(`%s`);""" % (k,json.dumps(v))
     return web.Response(status=200,text=js)
 
 async def wshandle(request):
@@ -185,7 +190,10 @@ async def wshandle(request):
                 else:
                     r=dict(result = current._routes[ o["command"]]( *o["args"] ) )
             except Exception as e:
-                r=dict(error = str(e), traceback=traceback.format_exc() )
+                r=dict(error = str(e)) 
+                print("="*79)
+                print(traceback.format_exc())
+                print("="*79)
 
             if "uuid" in o: r["uuid"]=o["uuid"]
 
@@ -221,11 +229,12 @@ class Base:
     _closeIfSocketClose=False
     _isLog=False
     _size=None
+    _kwargs={}  # Window only
     def __init__(self,instance,exposed={}):
         if isinstance(instance,Base):
             self._name=instance.__class__.__name__
             self._routes={n:v for n, v in inspect.getmembers(instance, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self._name in str(v)}  #  TODO: there should be a better way to discover class methos
-        else: # old style (eel))
+        else: # old style (eel)
             self._name=instance # aka page name
             self._routes=exposed
 
@@ -234,6 +243,8 @@ class Base:
         current=self    # set current !
 
         self._isLog=log
+
+        globals()["log"]("Will accept : %s" % ", ".join(self._routes.keys()) )  #TODO: not neat
 
         page=self._name+".html"
 
@@ -252,7 +263,7 @@ class Base:
             if type(app)==tuple and len(app)==2:
                 self._size=app
 
-        application=web.Application()
+        application=web.Application( loop=asyncio.get_event_loop() )
         application.add_routes([
                 web.get('/ws', wshandle),
 
@@ -274,8 +285,10 @@ class Base:
 
 class Window(Base):
     size=True   # or a tuple (wx,wy)
-    def __init__(self,port=8080,log=True):
+    def __init__(self,port=8080,log=True,**kwargs):
         super().__init__(self)
+        self.__dict__.update(kwargs)
+        self._kwargs=kwargs
         self._run(app=self.size,port=port,log=log)
 
     def exit(self): # exit is available for Window !!
