@@ -8,7 +8,7 @@ import uuid
 import inspect
 import types
 
-__version__="0.2.0+"
+__version__="0.2.1"
 
 try:
     os.chdir(sys._MEIPASS)  # when freezed with pyinstaller ;-)
