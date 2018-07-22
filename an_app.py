@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import wuy
 
-# it's the future ... (same as server.py, but with class concept)
+# it's the future ... (same as simple.py, but with class app concept)
 
 class index(wuy.Window):    # name the class as the web/<class_name>.html
+    size=(200,200)
+    
     def my_python_method(self,a,b):
         return a+b
 

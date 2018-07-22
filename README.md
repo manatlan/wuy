@@ -17,7 +17,7 @@ it's a proof of concept : WUY means **W**eb **U**ser **Y**nterface ...
 Download [the zip from here](https://github.com/manatlan/wuy/archive/master.zip)
 
     $ pip3 install aiohttp
-    $ python3 -u server.py
+    $ python3 -u simple.py
 
 ## to use
 

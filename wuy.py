@@ -217,16 +217,28 @@ def exit():         # exit method
     log("exit")
 
 class Window:
+    size=True
     def __init__(self):
         global exposed
         page=self.__class__.__name__
         d={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%page in str(v)}  #  TODO: there should be a better way to discover class methos
         exposed=d
-        start(page+".html",app=(640,480))
+        start(page+".html",app=self.size)
     def emit(self,*a,**k):
         emit(*a,**k)
     def exit(self):
         exit()
+
+class Server:
+    def __init__(self):
+        global exposed
+        page=self.__class__.__name__
+        d={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%page in str(v)}  #  TODO: there should be a better way to discover class methos
+        exposed=d
+        start(page+".html",app=False)
+    def emit(self,*a,**k):
+        emit(*a,**k)
+
 
 def start(page="index.html",port=8080,app=None,log=True):   # start method (app can be True, (width,size), ...)
     global closeIfSocketClose,size,isLog

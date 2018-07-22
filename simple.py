@@ -2,7 +2,7 @@
 import wuy
 
 # like eel (old fashion way, using decorators)
-# but it's still the main way (the historic way)! (see server2.py)
+# but it's still the main way (the historic way)! (see an_app.py)
 
 @wuy.expose
 def my_python_method(a,b):

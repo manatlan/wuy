@@ -1,0 +1,10 @@
+<script src="wuy.js"></script>
+
+What's your name ?
+<input id="txt"/><button onclick="post()">OK</button>
+
+<script>
+    function post() {
+        wuy.post( document.getElementById("txt").value )
+    }
+</script>

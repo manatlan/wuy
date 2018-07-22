@@ -1,0 +1,14 @@
+<script src="wuy.js"></script>
+
+<input id="txt"/><button onclick="post()">POST</button>
+<div id="msgs"></div>
+
+<script>
+    function post() {
+        wuy.post( document.getElementById("txt").value )
+    }
+
+    wuy.on("addTxt", function(txt) {
+        document.getElementById("msgs").innerHTML+="<li>"+txt+"</li>";
+    })
+</script>
