@@ -25,7 +25,7 @@ import types
 import base64
 
 
-__version__="0.4.1"
+__version__="0.4.2"
 DEFAULT_PORT=8080
 
 application=None

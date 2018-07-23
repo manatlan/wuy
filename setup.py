@@ -19,5 +19,6 @@ setuptools.setup(
     ),
     install_requires=[
           'aiohttp',
+          'winreg;platform_system=="Windows"'
     ],    
 )
