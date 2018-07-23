@@ -1,4 +1,3 @@
 @ECHO OFF
-c:\Python3\Scripts\pyinstaller.exe --noupx --onefile --noconsole server.py --add-data="web/index.html;web"
-REM ~ c:\Python3\Scripts\pyinstaller.exe web.spec
+c:\Python3\Scripts\pyinstaller.exe simple.py --noupx --onefile --noconsole --add-data="web;web"
 pause
