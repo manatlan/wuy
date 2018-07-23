@@ -23,7 +23,7 @@ import uuid
 import inspect
 import types
 
-__version__="0.3.4"
+__version__="0.3.5"
 DEFAULT_PORT=8080
 
 current=None    # the current instance of Base
@@ -38,15 +38,15 @@ def expose( f ):    # decorator !
 
 def path(f):
     if hasattr(sys,"_MEIPASS"): # when freezed with pyinstaller ;-)
-        return os.path.join(sys._MEIPASS,f)  
+        return os.path.join(sys._MEIPASS,f)
     else:
         return f
 
 def log(*a):
-    if current._isLog: print(*a)
+    if current and current._isLog: print(*a)
 
 def getBrowser():
-    for b in ['google-chrome','chrome',"chromium","chromium-browser","mozilla","firefox"]:
+    for b in ["'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe' %s",'google-chrome','chrome',"chromium","chromium-browser","mozilla","firefox"]:
         try:
             return webbrowser.get(b)
         except webbrowser.Error:
@@ -55,7 +55,10 @@ def getBrowser():
 def startApp(url):
     b=getBrowser()
     if b:
-        if "mozilla" in str(b).lower():
+        if "genericbrowser" in str(b).lower():  #TODO: here hopes it's chrome one
+            b.args=["--app="+url]
+            b.open(url, new=1, autoraise=True)
+        elif "mozilla" in str(b).lower():
             b._invoke(["--new-window",url],0,0) #window.close() won't work ;-(
         else:
             b._invoke(["--app="+url],1,1)
@@ -130,7 +133,7 @@ var wuy = new Proxy( {
         emit: function( evt, data) {        // to emit a event to all clients (except me), return a promise when done
             return wuy._call("emit",evt,data)
         },
-        _call: function( _ ) {               
+        _call: function( _ ) {
             var args=Array.prototype.slice.call(arguments);
 
             var cmd={
@@ -152,7 +155,7 @@ var wuy = new Proxy( {
                     });
                 })
             }
-            else 
+            else
                 return new Promise( function (resolve, reject) {
                     reject("not connected");
                 })
@@ -175,7 +178,7 @@ var wuy = new Proxy( {
         current._size and "window.resizeTo(%s,%s);"%(current._size[0],current._size[1]) or "",
         'document.title="%s";'%name,
         current._closeIfSocketClose and "window.close()" or "setTimeout( function() {setupWS(cbCnx)}, 1000);"
-        
+
 
     )
 
@@ -207,7 +210,7 @@ async def wshandle(request):
                         ret=await ret
                     r=dict(result = ret )
             except Exception as e:
-                r=dict(error = str(e)) 
+                r=dict(error = str(e))
                 print("="*79)
                 print(traceback.format_exc())
                 print("="*79)
@@ -322,8 +325,8 @@ class Server(Base):
 
 
 def start(page="index",port=DEFAULT_PORT,app=None,log=True):
-    """ old style run with exposed methods (like eel) 
-            'app' can be True, (width,size) (for window-like(app))            
+    """ old style run with exposed methods (like eel)
+            'app' can be True, (width,size) (for window-like(app))
             'app' can be None, False (for server-like)
     """
     b=Base(page,exposed)
