@@ -1,27 +1,24 @@
 # wuy 
 
-You have made a super python tool, and you want to add a GUI but without qt/gtk/tk/wx/kivy. You are in the right place ! Just re-use your local browser (chrome) as GUI.
+You have made a _super python tool_, and you want to add a GUI but without using the bigger qt/gtk/tk/wx/kivy. You are in the right place ! Just re-use the local browser (chrome) as GUI.
 
-Basically, it's a python module which will act as a web server (http & websocket) and will open/manage a window for you ; providing a simple framework (js/py3 helpers) to communicate between the window and the server.
+Basically, it's a python module which will act as a web server (http & websocket) and will open/manage a window for you ; providing a simple framework (js/py3 helpers).
 
-It lets you create your GUI with yours web skills (html/js/css or any js frameworks), and re-use the power of python on server side.
+It lets you create your GUI with yours web skills (html/js/css or any js frameworks/libs), and re-use the power of python on server side.
 
-Technically, it's a python3 module, using on asyncio and the marvellous [aiohttp](https://aiohttp.readthedocs.io/en/stable/). and (if present) the [uvloop](https://magic.io/blog/uvloop-blazing-fast-python-networking/), for the speed !
+Technically, it's a python3 module, using asyncio and the marvellous [aiohttp](https://aiohttp.readthedocs.io/en/stable/), and (if present) the [uvloop](https://magic.io/blog/uvloop-blazing-fast-python-networking/), for the full speed ! The http server is here to serve static content (html, js, images ...). The websocket is here to simplify the communication (sync/async) between the window & the server.
 
-In **app/window mode** : it will manage (open/close) the window for you ; using the chrome app mode !
+In **app/window mode** : it will manage (open/close) the window for you ; using the **chrome app mode** ; if the websocket brokes : window & server will shutdown (close the window ; the server will shutdown, close the server ; the window will shutdown). You (or your clients) will not see a difference with classical GUI ! If it can't start a chrome app : it will act as the server mode. 
 
-In **server mode** : it lets you
+In **server mode** : it will act as a classical web server ; and you can use as many clients/browsers as you want, from localhost or from anywhere else. Closing a socket ; just close the socket ;-). It can be hosted on the web, as long as the provider service use python3.
 
-It's like [python eel](https://github.com/ChrisKnott/Eel) BUT :
+In all cases : it will be pretty easy to produce(freeze) an executable/windows (one file with all html/js embedded), using [pyinstaller]((https://github.com/manatlan/wuy/blob/master/COMPILE.bat)). And share your _super python tool_ to the world.
 
-* it uses asyncio, and the marvellous [aiohttp](https://aiohttp.readthedocs.io/en/stable/) and [uvloop](https://magic.io/blog/uvloop-blazing-fast-python-networking/) if present.
-* it uses python3 ONLY
-* it's server hosted friendly from scratch (use wuy.Server) (but not IE11 compatible)
-* it uses pubsub mechanism to communicate from server to clients, or from client to clients
-* it can call sync or async rpc method on the server
-* it's pyinstaller-friendly on windows, see [bat file](https://github.com/manatlan/wuy/blob/master/COMPILE.bat)
-* com errors are catch'able with the promise
-* a wuy.Window can open another wuy.Window during a rpc call
+It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
+
+**TODOs**:
+* Make JS compatible with (the old) IE11.
+* Write docs
 
 ## to test/run
 
