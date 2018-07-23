@@ -25,9 +25,10 @@ import types
 import base64
 
 
-__version__="0.4.0"
+__version__="0.4.1"
 DEFAULT_PORT=8080
 
+application=None
 current=None    # the current instance of Base
 
 try:
@@ -304,13 +305,13 @@ class Base:
             self._routes=exposed
 
     def _run(self,port=DEFAULT_PORT,app=None,log=True):   # start method (app can be True, (width,size), ...)
+        global current,application
 
         try:
             os.chdir(os.path.split(sys.argv[0])[0])
         except:
             pass
 
-        global current
         current=self    # set current !
 
         self._isLog=log
@@ -342,17 +343,18 @@ class Base:
             if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
                 self._size=app
 
-        application=web.Application( loop=asyncio.get_event_loop() )
-        application.add_routes([
-            web.get('/ws',      wshandle),
-            web.get('/wuy.js',  handleJs),
-            web.get('/',        handleWeb),
-            web.get('/{path}',  handleWeb),
-        ])
-        try:
-            web.run_app(application,port=port)
-        except KeyboardInterrupt:
-            exit()
+        if application is None:
+            application=web.Application( loop=asyncio.get_event_loop() )
+            application.add_routes([
+                web.get('/ws',      wshandle),
+                web.get('/wuy.js',  handleJs),
+                web.get('/',        handleWeb),
+                web.get('/{path}',  handleWeb),
+            ])
+            try:
+                web.run_app(application,port=port)
+            except KeyboardInterrupt:
+                exit()
 
     def emit(self,*a,**k):  # emit available for all
         emit(*a,**k)

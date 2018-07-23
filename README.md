@@ -9,7 +9,7 @@ It's like [python eel](https://github.com/ChrisKnott/Eel) BUT :
 * it can call sync or async rpc method on the server
 * it's pyinstaller-friendly on windows, see [bat file](https://github.com/manatlan/wuy/blob/master/COMPILE.bat)
 * com errors are catch'able with the promise
-
+* a wuy.Window can open another wuy.Window during a rpc call
 
 ## to test/run
 
