@@ -2,15 +2,14 @@
 
 It's like [python eel](https://github.com/ChrisKnott/Eel) BUT :
 
-* it's not as polished
+* it uses asyncio, and the marvellous [aiohttp](https://aiohttp.readthedocs.io/en/stable/) and [uvloop](https://magic.io/blog/uvloop-blazing-fast-python-networking/) if present.
 * it uses python3 ONLY
-* it uses asyncio, and the marvellous [aiohttp](https://aiohttp.readthedocs.io/en/stable/)
-* it's server hosted friendly from scratch
+* it's server hosted friendly from scratch (use wuy.Server) (but not IE11 compatible)
 * it uses pubsub mechanism to communicate from server to clients, or from client to clients
-* it's not pyinstaller-friendly for now
-* com errors are catch'able thru the promise
+* it can call sync or async rpc method on the server
+* it's pyinstaller-friendly on windows, see [bat file](https://github.com/manatlan/wuy/blob/master/COMPILE.bat)
+* com errors are catch'able with the promise
 
-it's a proof of concept : WUY means **W**eb **U**ser **Y**nterface ...
 
 ## to test/run
 
@@ -22,7 +21,6 @@ Download [the zip from here](https://github.com/manatlan/wuy/archive/master.zip)
 ## to use
 
 Install the lib :
-
 
     $ pip3 install wuy
 
