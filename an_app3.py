@@ -5,10 +5,10 @@ import wuy
 
 class alert(wuy.Window):    # name the class as the web/<class_name>.html
     size=(200,70)
-    
+
     def quit(self):
         self.exit()
 
 if __name__=="__main__":
-    alert(msg="Tintin")
-    alert(msg="Milou")
+    alert(msg="El'Senôr")
+    alert(msg='"Madame"')

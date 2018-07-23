@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
-import wuy
+import wuy, asyncio
 
 # it's the future ... (example of running long request)
-import asyncio
-
-  
 
 class doSomething(wuy.Window):    # name the class as the web/<class_name>.html
-    size=(200,70)
-    
-    def doSyncQuick(self):
-        return "s quick"
+    size=(300,300)
 
-    def doSyncLong(self):
+    def doSyncQuick(self):
+        return "quick"
+
+    def doSyncLong(self):           # run synchro (hangs the ui)
         import time
         time.sleep(2)
-        return "s long"
+        return "long"
 
-    def doASyncLong(self):
-
-        async def takeLong():
-            await asyncio.sleep(3)
-            self.emit("event","task ok")
-
-        asyncio.ensure_future(takeLong())
-        return "task started"
+    async def doASyncLong(self):    # run asynchro !!! (it doesn't hang the UI !)
+        await asyncio.sleep(3)
+        return "async long"
 
 if __name__=="__main__":
-    doSomething()
+    doSomething(port=8081)

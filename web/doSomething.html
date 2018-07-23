@@ -1,9 +1,11 @@
+<head>
 <script src="wuy.js"></script>
-
 <script>
 function rep(x) {
     document.getElementById("rep").innerHTML="<li>"+x+"</li>"+document.getElementById("rep").innerHTML;
 }
+
+wuy.on("event", rep )
 </script>
 </head>
 <body>
@@ -12,8 +14,4 @@ function rep(x) {
 <button onclick="wuy.doSyncLong().then(rep)">s long</button>
 <button onclick="wuy.doASyncLong().then(rep)">as long</button>
 
-<script>
-    wuy.on("event", rep )    
-</script>
-
-Returned:<span id="rep"></span><br/>
+<div id="rep"></div

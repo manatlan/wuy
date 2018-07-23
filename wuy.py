@@ -22,11 +22,20 @@ import traceback
 import uuid
 import inspect
 import types
+import base64
 
-__version__="0.3.5"
+
+__version__="0.4.0"
 DEFAULT_PORT=8080
 
 current=None    # the current instance of Base
+
+try:
+    import uvloop
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+    print("uvloop")
+except ModuleNotFoundError:
+    pass
 
 # helpers
 #############################################################
@@ -45,38 +54,60 @@ def path(f):
 def log(*a):
     if current and current._isLog: print(*a)
 
-def getBrowser():
-    for b in ["'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe' %s",'google-chrome','chrome',"chromium","chromium-browser","mozilla","firefox"]:
+def getChrome():
+    def getExe():
+        if sys.platform in ['win32', 'win64']:
+            return find_chrome_win()
+        elif sys.platform == 'darwin':
+            return find_chrome_mac()
+
+    exe=getExe()
+    if exe:
+        return webbrowser.GenericBrowser(exe)
+    else:
+        webbrowser._tryorder=['google-chrome','chrome',"chromium","chromium-browser"]
         try:
-            return webbrowser.get(b)
+            return webbrowser.get()
         except webbrowser.Error:
+            return None
+
+def find_chrome_win():
+    import winreg #TODO: pip3 install winreg
+    reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe'
+    for install_type in winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE:
+        try:
+            with winreg.OpenKey(install_type, reg_path, 0, winreg.KEY_READ) as reg_key:
+                return winreg.QueryValue(reg_key, None)
+        except WindowsError:
             pass
 
-def startApp(url):
-    b=getBrowser()
-    if b:
-        if "genericbrowser" in str(b).lower():  #TODO: here hopes it's chrome one
-            b.args=["--app="+url]
-            b.open(url, new=1, autoraise=True)
-        elif "mozilla" in str(b).lower():
-            b._invoke(["--new-window",url],0,0) #window.close() won't work ;-(
-        else:
-            b._invoke(["--app="+url],1,1)
-        return True
+def find_chrome_mac():
+    default_dir = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+    if os.path.exists(default_dir):
+        return default_dir
 
+def openApp(url):
+    chrome=getChrome()
+    if chrome:
+        if isinstance(chrome,webbrowser.GenericBrowser):
+            chrome.args=["--app="+url]
+            return chrome.open(url, new=1, autoraise=True)
+        else:
+            return chrome._invoke(["--app="+url],1,1)
 
 
 # Async aiohttp things (use current)
 #############################################################
-async def as_emit(event,args,exceptMe=None):
+async def wsSend( ws, **kargs ):
+    log("< send:",kargs)
+    await ws.send_str( json.dumps( kargs ) )
+
+
+async def asEmit(event,args,exceptMe=None):
     global current
     for ws in current._clients:
         if id(ws) != id(exceptMe):
-            log("  < emit event '%s' : %s" % (event,args))
-            await ws.send_str( json.dumps( dict(event=event,args=args) ))
-
-def emit(event,args):   # sync version of emit for py side !
-    asyncio.ensure_future( as_emit( event, args) )
+            await wsSend(ws,event=event, args=args )
 
 async def handleWeb(request): # serve all statics from web folder
     file = path('./web/'+request.match_info.get('path', "index.html"))
@@ -126,7 +157,7 @@ function setupWS( cbCnx ) {
 }
 
 var wuy = new Proxy( {
-        _ws: setupWS( ws=>{wuy._ws = ws} ),
+        _ws: setupWS( function(ws){wuy._ws = ws} ),
         on: function( evt, callback ) {     // to register an event on a callback
             document.addEventListener(evt,function(e) { callback(e.detail) })
         },
@@ -159,11 +190,10 @@ var wuy = new Proxy( {
                 return new Promise( function (resolve, reject) {
                     reject("not connected");
                 })
-
         }
     },
     {
-        get: function(target, propKey, receiver){   // proxy: wuy.method(args) ==> wuy._call( method, args )
+        get: function(target, propKey, receiver){   // proxy: wuy.method(args) ---> wuy._call( method, args )
             if(target.hasOwnProperty(propKey))
                 return target[propKey];
             else
@@ -178,14 +208,13 @@ var wuy = new Proxy( {
         current._size and "window.resizeTo(%s,%s);"%(current._size[0],current._size[1]) or "",
         'document.title="%s";'%name,
         current._closeIfSocketClose and "window.close()" or "setTimeout( function() {setupWS(cbCnx)}, 1000);"
-
-
     )
-
 
     if current._kwargs:
         for k,v in current._kwargs.items():
-            js+="""\n%s=JSON.parse(`%s`);""" % (k,json.dumps(v))
+            j64=str(base64.b64encode(bytes(json.dumps(v),"utf8")),"utf8")   # thru b64 to avoid trouble with quotes or strangers chars
+            js+="""\nwuy.%s=JSON.parse(atob("%s"));""" % (k,j64)
+
     return web.Response(status=200,text=js)
 
 async def wshandle(request):
@@ -202,29 +231,46 @@ async def wshandle(request):
                 log("> RECEPT",o)
                 if o["command"] == "emit":
                     event, *args = o["args"]
-                    await as_emit( event, args, ws) # emit to everybody except me
+                    await asEmit( event, args, ws) # emit to everybody except me
                     r=dict(result = args)           # but return the same content sended, thru the promise
                 else:
-                    ret=current._routes[ o["command"]]( *o["args"] )
-                    if "coroutine" in str(type(ret)):
-                        ret=await ret
+                    ret=current._routes[o["command"]]( *o["args"] )
+                    if ret and asyncio.iscoroutine(ret):
+                        log(". ASync call",o["command"])
+
+                        async def waitReturn( coroutine,uuid ):
+                            try:
+                                ret=await coroutine
+                                m=dict(result=ret, uuid=uuid)
+                            except Exception as e:
+                                m=dict(error=str(e), uuid=uuid)
+                                print("="*40,"in ASync",o["command"])
+                                print(traceback.format_exc().strip())
+                                print("="*40)
+                            await wsSend(ws, **m )
+
+                        asyncio.ensure_future( waitReturn(ret,o["uuid"]) )
+                        continue # don't answer yet (the coroutine will do it)
+
                     r=dict(result = ret )
             except Exception as e:
                 r=dict(error = str(e))
-                print("="*79)
-                print(traceback.format_exc())
+                print("="*40,"on Recept",msg.data)
+                print(traceback.format_exc().strip())
                 print("="*79)
 
             if "uuid" in o: r["uuid"]=o["uuid"]
 
-            log("< return",r)
-            await ws.send_str( json.dumps( r ) )
+            await wsSend(ws, **r )
         elif msg.type == web.WSMsgType.close:
             break
 
     current._clients.remove( ws )
     if current._closeIfSocketClose: exit()
     return ws
+
+def emit(event,args):   # sync version of emit for py side !
+    asyncio.ensure_future( asEmit( event, args) )
 
 def exit():         # exit method
     async def handle_exception(task):
@@ -285,8 +331,16 @@ class Base:
             print("Create 'web/%s', just edit it" % os.path.basename(startpage))
 
         if app:
-            self._closeIfSocketClose=startApp("http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex))
-            if type(app)==tuple and len(app)==2:
+            url = "http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex)
+            isBrowser = openApp(url)
+            if isBrowser:
+                self._closeIfSocketClose=True
+            else:
+                print("Can't find Chrome on your desktop ;-(")
+                print("(Switch to server mode)")
+                print("Surf to %s !" % url)
+
+            if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
                 self._size=app
 
         application=web.Application( loop=asyncio.get_event_loop() )
@@ -332,6 +386,5 @@ def start(page="index",port=DEFAULT_PORT,app=None,log=True):
     b=Base(page,exposed)
     b._run(port=port,app=app,log=log)
 
-
 if __name__=="__main__":
-    log("test",42)
+    openApp("https://github.com/manatlan/wuy")
