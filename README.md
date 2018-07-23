@@ -1,6 +1,6 @@
 # wuy 
 
-You have made a _super python tool_, and you want to add a GUI but without using the bigger qt/gtk/tk/wx/kivy. You are in the right place ! Just re-use the local browser (chrome) as GUI, drived by **wuy**.
+You have made a _super python tool_, and you want to add a GUI but without using the bigger qt/gtk/tk/wx/kivy. You are in the right place ! Just re-use the local browser (chrome in app mode) as GUI, drived by **wuy**.
 
 Basically, it's a python module which will act as a web server (http & websocket) and will open/manage a window for you ; providing a simple framework (js/py3 helpers).
 
