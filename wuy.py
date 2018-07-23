@@ -25,7 +25,7 @@ import types
 import base64
 
 
-__version__="0.4.2"
+__version__="0.4.3"
 DEFAULT_PORT=8080
 
 application=None
@@ -343,6 +343,8 @@ class Base:
             if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
                 self._size=app
 
+        self.init()
+
         if application is None:
             application=web.Application( loop=asyncio.get_event_loop() )
             application.add_routes([
@@ -359,6 +361,8 @@ class Base:
     def emit(self,*a,**k):  # emit available for all
         emit(*a,**k)
 
+    def init(self):
+        pass
 
 class Window(Base):
     size=True   # or a tuple (wx,wy)
