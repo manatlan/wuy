@@ -6,7 +6,7 @@ import wuy, asyncio,datetime
 class updater(wuy.Window):    # name the class as the web/<class_name>.html
     size=(300,100)
 
-    def init(self):
+    def init(self):             #<- special method which is called at the start !
         self.emit("event",str(datetime.datetime.now()))
         asyncio.get_event_loop().call_later(self.time, self.init)        
 
