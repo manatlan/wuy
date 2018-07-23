@@ -1,6 +1,6 @@
 # wuy 
 
-You have made a _super python tool_, and you want to add a GUI but without using the bigger qt/gtk/tk/wx/kivy. You are in the right place ! Just re-use the local browser (chrome) as GUI.
+You have made a _super python tool_, and you want to add a GUI but without using the bigger qt/gtk/tk/wx/kivy. You are in the right place ! Just re-use the local browser (chrome) as GUI, drived by **wuy**.
 
 Basically, it's a python module which will act as a web server (http & websocket) and will open/manage a window for you ; providing a simple framework (js/py3 helpers).
 
@@ -12,12 +12,12 @@ In **app/window mode** : it will manage (open/close) the window for you ; using 
 
 In **server mode** : it will act as a classical web server ; and you can use as many clients/browsers as you want, from localhost or from anywhere else. Closing a socket ; just close the socket ;-). It can be hosted on the web, as long as the provider service use python3.
 
-In all cases : it will be pretty easy to produce(freeze) an executable/windows (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/COMPILE.bat). And share your _super python tool_ to the world.
+In all cases : it will be pretty easy to produce/freeze an executable/windows (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/COMPILE.bat). And share your _super python tool_ to the world.
 
 It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
 
 **TODOs**:
-* Make JS compatible with (the old) IE11.
+* Make JS compatible with (the old) IE11 too.
 * Write docs
 
 ## to test/run
@@ -49,7 +49,7 @@ wuy.start(app=True)
 ```
 Run it, like this :
 
-    python3 web.py
+    $ python3 web.py
 
 It will create a "web/index.html", the defaut front-end ;-)
 
@@ -74,7 +74,7 @@ wuy.start(app=(640,480))
 
 and rerun your script :
 
-    python3 web.py
+    $ python3 web.py
 
 and you can start to code
 
