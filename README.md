@@ -1,5 +1,17 @@
 # wuy 
 
+You have made a super python tool, and you want to add a GUI but without qt/gtk/tk/wx/kivy. You are in the right place ! Just re-use your local browser (chrome) as GUI.
+
+Basically, it's a python module which will act as a web server (http & websocket) and will open/manage a window for you ; providing a simple framework (js/py3 helpers) to communicate between the window and the server.
+
+It lets you create your GUI with yours web skills (html/js/css or any js frameworks), and re-use the power of python on server side.
+
+Technically, it's a python3 module, using on asyncio and the marvellous [aiohttp](https://aiohttp.readthedocs.io/en/stable/). and (if present) the [uvloop](https://magic.io/blog/uvloop-blazing-fast-python-networking/), for the speed !
+
+In **app/window mode** : it will manage (open/close) the window for you ; using the chrome app mode !
+
+In **server mode** : it lets you
+
 It's like [python eel](https://github.com/ChrisKnott/Eel) BUT :
 
 * it uses asyncio, and the marvellous [aiohttp](https://aiohttp.readthedocs.io/en/stable/) and [uvloop](https://magic.io/blog/uvloop-blazing-fast-python-networking/) if present.
