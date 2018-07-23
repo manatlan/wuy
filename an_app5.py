@@ -8,7 +8,7 @@ class updater(wuy.Window):    # name the class as the web/<class_name>.html
 
     def init(self):
         self.emit("event",str(datetime.datetime.now()))
-        asyncio.get_event_loop().call_later(2, self.init)        
+        asyncio.get_event_loop().call_later(self.time, self.init)        
 
 if __name__=="__main__":
-    updater()
+    updater(time=1)
