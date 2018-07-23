@@ -33,7 +33,6 @@ current=None    # the current instance of Base
 try:
     import uvloop
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-    print("uvloop")
 except ModuleNotFoundError:
     pass
 
