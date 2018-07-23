@@ -85,7 +85,7 @@ See examples :
 * [an_app](https://github.com/manatlan/wuy/blob/master/an_app.py) : same as simple.py but in the new fashion
 * [an_app2](https://github.com/manatlan/wuy/blob/master/an_app2.py) : an input box
 * [an_app3](https://github.com/manatlan/wuy/blob/master/an_app3.py) : an alert box with autodeclared js vars (chain'able windows)!
-* [an_app4](https://github.com/manatlan/wuy/blob/master/an_app4.py) : using sync & async rpc call !
+* [an_app4](https://github.com/manatlan/wuy/blob/master/an_app4.py) : using sync & async rpc calls !
 * [an_app5](https://github.com/manatlan/wuy/blob/master/an_app5.py) : using a continuous push from server to client
 * [a_server](https://github.com/manatlan/wuy/blob/master/a_server.py) : a server, tchat service for multiple clients
 
