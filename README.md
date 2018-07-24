@@ -47,7 +47,7 @@ Install the lib :
 (_winreg_ is needed for windows only)
 
 * See the [old style (like Eel)](https://github.com/manatlan/wuy/blob/master/wiki/old.md) ****DEPRECATED****
-* See the [new stle](https://github.com/manatlan/wuy/blob/master/wiki/tuto.md)
+* See the [new style](https://github.com/manatlan/wuy/blob/master/wiki/tuto.md)
 
 ## See Examples
 
