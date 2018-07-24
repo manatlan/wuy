@@ -6,7 +6,7 @@ Basically, it's a python module which will act as a web server (http & websocket
 
 It lets you create your GUI with yours web skills (html/js/css or any js frameworks/libs), and re-use the power of python on server side.
 
-Technically, it's a python3 module, using asyncio and the marvellous [aiohttp](https://aiohttp.readthedocs.io/en/stable/), and (if present) the [uvloop](https://magic.io/blog/uvloop-blazing-fast-python-networking/), for the full speed ! The http server is here to serve static content (html, js, images ...). The websocket is here to simplify the communication (sync/async) between the window & the server.
+Technically, it's a python3 module, using asyncio and the marvellous [aiohttp](https://aiohttp.readthedocs.io/en/stable/), and (if present) the [uvloop](https://magic.io/blog/uvloop-blazing-fast-python-networking/), for the full speed ! The http server is here to serve static content (html, js, images ...). The websocket is here to simplify the communication (sync/async) between the window & the server. (rpc method to communicate from client to server, pubsub mechanism to communicate from server to clients, or from client to clients)
 
 In **app/window mode** : it will manage (open/close) the window for you ; using the **chrome app mode** ; if the websocket brokes : window & server will shutdown (close the window ; the server will shutdown, close the server ; the window will shutdown). You (or your clients) will not see a difference with classical GUI ! If it can't start a chrome app : it will act as the server mode. 
 
