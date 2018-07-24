@@ -1,6 +1,6 @@
 # wuy 
 
-<img src="https://github.com/manatlan/wuy/blob/master/wiki/capture.png" style="float:right;margin:10px"/>
+<span style="float:right;margin:10px;"><img src="https://github.com/manatlan/wuy/blob/master/wiki/capture.png"/></span>
 
 If you have made a _super python tool_, and you want to add a GUI but without using the biggest qt/gtk/tk/wx/kivy : you are in the right place ! Just re-use the local browser (chrome in app mode) as GUI, drived by **wuy**.
 
