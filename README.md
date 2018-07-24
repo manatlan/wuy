@@ -4,7 +4,7 @@ If you have made a _super python tool_, and you want to add a GUI but without us
 
 <p align="center">
     <img src="https://github.com/manatlan/wuy/blob/master/wiki/capture.png"/><br/>
-    <a href="https://github.com/manatlan/wuy/blob/master/web/askName.html">html</a>
+    <a href="https://github.com/manatlan/wuy/blob/master/web/askName.html">html</a> / 
     <a href="https://github.com/manatlan/wuy/blob/master/an_app2.py">python</a>
 </p>
 
