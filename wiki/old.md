@@ -37,7 +37,7 @@ and rerun your script :
 
     $ python3 web.py
 
-It's really like [python eel](https://github.com/ChrisKnott/Eel), but [you should start with the new style] (https://github.com/manatlan/wuy/blob/master/wiki/tuto.md) if you want to go with **wuy**.
+It's really like [python eel](https://github.com/ChrisKnott/Eel), but [you should start with the new style](https://github.com/manatlan/wuy/blob/master/wiki/tuto.md) if you want to go with **wuy**.
 
 If you want to migrate from eel to wuy :
 
