@@ -1,8 +1,8 @@
 # wuy 
 
-<span style="float:right;margin:10px;"><img src="https://github.com/manatlan/wuy/blob/master/wiki/capture.png"/></span>
-
 If you have made a _super python tool_, and you want to add a GUI but without using the biggest qt/gtk/tk/wx/kivy : you are in the right place ! Just re-use the local browser (chrome in app mode) as GUI, drived by **wuy**.
+
+<div style="text-align:center;"><img src="https://github.com/manatlan/wuy/blob/master/wiki/capture.png"/></div>
 
 Basically, it's a python module which will act as a web server (http & websocket) and will open/manage a window for you ; providing a simple framework (js/py3 helpers).
 
