@@ -25,10 +25,10 @@ It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
 
 Download [the zip from here](https://github.com/manatlan/wuy/archive/master.zip)
 
-    $ pip3 install aiohttp
+    $ pip3 install aiohttp winreg
     $ python3 -u simple.py
 
-(on windows : _pip3.exe install winreg aiohttp_)
+(_winreg_ is needed for windows only)
 
 or the new way of doing things, for app/window:
 
@@ -38,7 +38,7 @@ For the server
 
     $ python3 -u a_server.py
 
-## to use
+## To Use
 
 Install the lib :
 
@@ -47,7 +47,7 @@ Install the lib :
 (_winreg_ is needed for windows only)
 
 
-See the [old style (like Eel)](https://github.com/manatlan/wuy/blob/master/wiki/old.md)
+See the [old style (like Eel)](https://github.com/manatlan/wuy/blob/master/wiki/old.md) **DEPRECATED**
 
 See the [new stle](https://github.com/manatlan/wuy/blob/master/wiki/tuto.md)
 
