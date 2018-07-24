@@ -47,10 +47,11 @@ Install the lib :
 (_winreg__ is needed for windows only)
 
 
+See the [old style (like Eel)](https://github.com/manatlan/wuy/blob/master/wiki/old.md)
 
-## but the future is ... bright ;-)
+See the [new stle](https://github.com/manatlan/wuy/blob/master/wiki/tuto.md)
 
-See examples :
+## See Examples
 
 * [an_app](https://github.com/manatlan/wuy/blob/master/an_app.py) : same as simple.py but in the new fashion
 * [an_app2](https://github.com/manatlan/wuy/blob/master/an_app2.py) : an input box
