@@ -4,7 +4,8 @@ If you have made a _super python tool_, and you want to add a GUI but without us
 
 <p align="center">
     <img src="https://github.com/manatlan/wuy/blob/master/wiki/capture.png"/><br/>
-    <a href="https://github.com/manatlan/wuy/blob/master/web/askName.html">See the html side</a>
+    <a href="https://github.com/manatlan/wuy/blob/master/web/askName.html">html</a>
+    <a href="https://github.com/manatlan/wuy/blob/master/an_app2.py">python</a>
 </p>
 
 Basically, it's a python module which will act as a web server (http & websocket) and will open/manage a window for you ; providing a simple framework (js/py3 helpers).
