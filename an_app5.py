@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import wuy, asyncio,datetime
+import wuy, aiohttp
 
-# it's the future ... (example of running long request)
+# it's the future ... (call a http service during an async rpc method call)
 
-class updater(wuy.Window):    # name the class as the web/<class_name>.html
-    size=(300,100)
+class fetch(wuy.Window):    # name the class as the web/<class_name>.html
+    size=(400,400)
 
-    def init(self):             #<- special method which is called at the start !
-        self.emit("event",str(datetime.datetime.now()))
-        asyncio.get_event_loop().call_later(self.time, self.init)        
+    async def requestWeb(self,url):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                return await resp.text()
 
 if __name__=="__main__":
-    updater(time=1)
+    fetch()

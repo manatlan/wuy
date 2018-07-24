@@ -1,6 +1,6 @@
 # wuy 
 
-You have made a _super python tool_, and you want to add a GUI but without using the bigger qt/gtk/tk/wx/kivy. You are in the right place ! Just re-use the local browser (chrome in app mode) as GUI, drived by **wuy**.
+If you have made a _super python tool_, and you want to add a GUI but without using the biggest qt/gtk/tk/wx/kivy : you are in the right place ! Just re-use the local browser (chrome in app mode) as GUI, drived by **wuy**.
 
 Basically, it's a python module which will act as a web server (http & websocket) and will open/manage a window for you ; providing a simple framework (js/py3 helpers).
 
@@ -14,11 +14,12 @@ In **server mode** : it will act as a classical web server ; and you can use as 
 
 In all cases : it will be pretty easy to produce/freeze an executable/windows (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/COMPILE.bat). And share your _super python tool_ to the world.
 
+For **app/window mode**: the wuy/js will work like a charm in chrome. For **server mode**: you can add [polyfill](https://polyfill.io/v2/docs/) to be able to use a lot of older browser (ie11, etc ...), see the [tchat](https://github.com/manatlan/wuy/blob/master/web/tchat.html) server.
+
 It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
 
 **TODOs**:
-* Make JS compatible with (the old) IE11 too.
-* Write docs
+* Write docs & examples
 
 ## to test/run
 
@@ -40,6 +41,8 @@ For the server
 Install the lib :
 
     $ pip3 install wuy
+
+(on windows : _pip3.exe install winreg wuy_)
 
 create a python file "web.py", and copy/paste this:
 
@@ -86,7 +89,8 @@ See examples :
 * [an_app2](https://github.com/manatlan/wuy/blob/master/an_app2.py) : an input box
 * [an_app3](https://github.com/manatlan/wuy/blob/master/an_app3.py) : an alert box with autodeclared js vars (chain'able windows)!
 * [an_app4](https://github.com/manatlan/wuy/blob/master/an_app4.py) : using sync & async rpc calls !
-* [an_app5](https://github.com/manatlan/wuy/blob/master/an_app5.py) : using a continuous push from server to client
+* [an_app5](https://github.com/manatlan/wuy/blob/master/an_app5.py) : using async aiohttp.get (request content from web)
+* [an_appVuejs](https://github.com/manatlan/wuy/blob/master/an_appVuejs.py) : using a vuejs app (and  a continuous push from server to client)
 * [a_server](https://github.com/manatlan/wuy/blob/master/a_server.py) : a server, tchat service for multiple clients
 
 with **wuy.Window** for app (which open/manage a chrome window app)

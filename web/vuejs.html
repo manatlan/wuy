@@ -1,0 +1,30 @@
+<script type="text/javascript" src="wuy.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+
+<div id="app">
+    Event's date: {{date}}
+    <hr/>
+    <button @click="letsInc()">Server ++ </button> : {{val}}
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    val:1,
+    date:"?",
+  },
+  created() {
+    wuy.on("setTheDate", x=>{this.date=x} )
+  },
+  methods: {
+      letsInc() {
+          wuy.inc( this.val ).then( x=>{
+            this.val = x;
+          });
+      },
+  }
+})
+</script>
+
+

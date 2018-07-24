@@ -2,12 +2,12 @@ import wuy
 import setuptools
 
 setuptools.setup(
-    name='wuy',    
+    name='wuy',
     version=wuy.__version__,
 
     author="manatlan",
     author_email="manatlan@gmail.com",
-    description="Like python eel, but for py3, with asyncio",
+    description="A simple module for making HTML GUI applications with python3/asyncio",
     long_description=open("README.md","r").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/manatlan/wuy",
@@ -19,6 +19,6 @@ setuptools.setup(
     ),
     install_requires=[
           'aiohttp',
-          'winreg;platform_system=="Windows"'
-    ],    
+          #~ 'winreg;platform_system=="Windows"'    (doesn't work on w10 ?!)
+    ],
 )

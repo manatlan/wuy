@@ -3,6 +3,7 @@ import wuy
 
 # it's the future ... (the server never ends or open a browser)
 # a simple tchat for many clients
+# (with IE11 compatibility, see tchat.html which include a polyfill)
 
 class tchat(wuy.Server):    # name the class as the web/<class_name>.html
     

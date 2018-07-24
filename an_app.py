@@ -4,8 +4,8 @@ import wuy
 # it's the future ... (same as simple.py, but with class app concept)
 
 class index(wuy.Window):    # name the class as the web/<class_name>.html
-    size=(200,200)
-    
+    size=(300,300)
+
     def my_python_method(self,a,b):
         return a+b
 

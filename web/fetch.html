@@ -1,0 +1,11 @@
+<script src="wuy.js"></script>
+<script>
+function get(url) {
+    wuy.requestWeb(url) .then( txt=>{ document.getElementById("rep").innerHTML=txt; })
+}
+
+</script>
+
+<button onclick="get('https://pypi.org/project/wuy/')">Site 1</button>
+<button onclick="get('https://pypi.org/project/reqman/')">Site 2</button>
+<div id="rep"></div>

@@ -25,7 +25,8 @@ import types
 import base64
 
 
-__version__="0.4.4"
+__version__="0.4.5"
+
 DEFAULT_PORT=8080
 
 application=None
@@ -156,54 +157,41 @@ function setupWS( cbCnx ) {
     return ws;
 }
 
-var wuy = new Proxy( {
-        _ws: setupWS( function(ws){wuy._ws = ws} ),
-        on: function( evt, callback ) {     // to register an event on a callback
-            document.addEventListener(evt,function(e) { callback(e.detail) })
-        },
-        emit: function( evt, data) {        // to emit a event to all clients (except me), return a promise when done
-            return wuy._call("emit",evt,data)
-        },
-        _call: function( _ ) {
-            var args=Array.prototype.slice.call(arguments);
-
-            var cmd={
-                command:    args.shift(0),
-                args:       args,
-            };
-            cmd.uuid = cmd.command+"-"+Math.random().toString(36).substring(2); // stamp the exchange, so the callback can be called back (thru customevent)
-            if(wuy._ws) {
-                wuy._ws.send( JSON.stringify(cmd) );
-
-                return new Promise( function (resolve, reject) {
-                    document.addEventListener('wuy-'+cmd.uuid, function handler(x) {
-                        this.removeEventListener('wuy-'+cmd.uuid, handler);
-                        var x=x.detail;
-                        if(x && x.result)
-                            resolve(x.result)
-                        else
-                            reject(x.error)
-                    });
-                })
-            }
-            else
-                return new Promise( function (resolve, reject) {
-                    reject("not connected");
-                })
-        }
+var wuy={
+    _ws: setupWS( function(ws){wuy._ws = ws} ),
+    on: function( evt, callback ) {     // to register an event on a callback
+        document.addEventListener(evt,function(e) { callback(e.detail) })
     },
-    {
-        get: function(target, propKey, receiver){   // proxy: wuy.method(args) ---> wuy._call( method, args )
-            if(target.hasOwnProperty(propKey))
-                return target[propKey];
-            else
-                return function() {
-                    var args=[propKey].concat( Array.prototype.slice.call(arguments) )
-                    return target._call.apply( target, args);
-                }
-        }
+    emit: function( evt, data) {        // to emit a event to all clients (except me), return a promise when done
+        return wuy._call("emit", [evt,data])
     },
-);
+    _call: function( method, args ) {
+        var cmd={
+            command:    method,
+            args:       args,
+            uuid:       method+"-"+Math.random().toString(36).substring(2), // stamp the exchange, so the callback can be called back (thru customevent)
+        };
+
+        if(wuy._ws) {
+            wuy._ws.send( JSON.stringify(cmd) );
+
+            return new Promise( function (resolve, reject) {
+                document.addEventListener('wuy-'+cmd.uuid, function handler(x) {
+                    this.removeEventListener('wuy-'+cmd.uuid, handler);
+                    var x=x.detail;
+                    if(x && x.result)
+                        resolve(x.result)
+                    else if(x && x.error)
+                        resolve(x.error)
+                });
+            })
+        }
+        else
+            return new Promise( function (resolve, reject) {
+                reject("not connected");
+            })
+    }
+};
 """ % (
         current._size and "window.resizeTo(%s,%s);"%(current._size[0],current._size[1]) or "",
         'document.title="%s";'%name,
@@ -215,6 +203,9 @@ var wuy = new Proxy( {
             j64=str(base64.b64encode(bytes(json.dumps(v),"utf8")),"utf8")   # thru b64 to avoid trouble with quotes or strangers chars
             js+="""\nwuy.%s=JSON.parse(atob("%s"));""" % (k,j64)
 
+    for k in current._routes.keys():
+        js+="""\nwuy.%s=function(_) {return wuy._call("%s", Array.prototype.slice.call(arguments) )};""" % (k,k)
+
     return web.Response(status=200,text=js)
 
 async def wshandle(request):
@@ -223,49 +214,50 @@ async def wshandle(request):
     await ws.prepare(request)
 
     current._clients.append(ws)
+    try:
+        async for msg in ws:
+            if msg.type == web.WSMsgType.text:
+                try:
+                    o=json.loads( msg.data )
+                    log("> RECEPT",o)
+                    if o["command"] == "emit":
+                        event, *args = o["args"]
+                        await asEmit( event, args, ws) # emit to everybody except me
+                        r=dict(result = args)           # but return the same content sended, thru the promise
+                    else:
+                        ret=current._routes[o["command"]]( *o["args"] )
+                        if ret and asyncio.iscoroutine(ret):
+                            log(". ASync call",o["command"])
 
-    async for msg in ws:
-        if msg.type == web.WSMsgType.text:
-            try:
-                o=json.loads( msg.data )
-                log("> RECEPT",o)
-                if o["command"] == "emit":
-                    event, *args = o["args"]
-                    await asEmit( event, args, ws) # emit to everybody except me
-                    r=dict(result = args)           # but return the same content sended, thru the promise
-                else:
-                    ret=current._routes[o["command"]]( *o["args"] )
-                    if ret and asyncio.iscoroutine(ret):
-                        log(". ASync call",o["command"])
+                            async def waitReturn( coroutine,uuid ):
+                                try:
+                                    ret=await coroutine
+                                    m=dict(result=ret, uuid=uuid)
+                                except Exception as e:
+                                    m=dict(error=str(e), uuid=uuid)
+                                    print("="*40,"in ASync",o["command"])
+                                    print(traceback.format_exc().strip())
+                                    print("="*40)
+                                await wsSend(ws, **m )
 
-                        async def waitReturn( coroutine,uuid ):
-                            try:
-                                ret=await coroutine
-                                m=dict(result=ret, uuid=uuid)
-                            except Exception as e:
-                                m=dict(error=str(e), uuid=uuid)
-                                print("="*40,"in ASync",o["command"])
-                                print(traceback.format_exc().strip())
-                                print("="*40)
-                            await wsSend(ws, **m )
+                            asyncio.ensure_future( waitReturn(ret,o["uuid"]) )
+                            continue # don't answer yet (the coroutine will do it)
 
-                        asyncio.ensure_future( waitReturn(ret,o["uuid"]) )
-                        continue # don't answer yet (the coroutine will do it)
+                        r=dict(result = ret )
+                except Exception as e:
+                    r=dict(error = str(e))
+                    print("="*40,"on Recept",msg.data)
+                    print(traceback.format_exc().strip())
+                    print("="*79)
 
-                    r=dict(result = ret )
-            except Exception as e:
-                r=dict(error = str(e))
-                print("="*40,"on Recept",msg.data)
-                print(traceback.format_exc().strip())
-                print("="*79)
+                if "uuid" in o: r["uuid"]=o["uuid"]
 
-            if "uuid" in o: r["uuid"]=o["uuid"]
+                await wsSend(ws, **r )
+            elif msg.type == web.WSMsgType.close:
+                break
+    finally:
+        current._clients.remove( ws )
 
-            await wsSend(ws, **r )
-        elif msg.type == web.WSMsgType.close:
-            break
-
-    current._clients.remove( ws )
     if current._closeIfSocketClose: exit()
     return ws
 
@@ -346,7 +338,7 @@ class Base:
         self.init()
 
         if application is None:
-            application=web.Application( loop=asyncio.get_event_loop() )
+            application=web.Application()
             application.add_routes([
                 web.get('/ws',      wshandle),
                 web.get('/wuy.js',  handleJs),
@@ -354,7 +346,10 @@ class Base:
                 web.get('/{path}',  handleWeb),
             ])
             try:
-                web.run_app(application,port=port)
+                if self._closeIfSocketClose: # app-mode, don't shout "server started,  Running on, ctrl-c"
+                    web.run_app(application,port=port,print=lambda *a,**k: None)
+                else:
+                    web.run_app(application,port=port)
             except KeyboardInterrupt:
                 exit()
 
