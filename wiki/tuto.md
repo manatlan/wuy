@@ -1,4 +1,4 @@
-## Create a wuy add, in the old/eel style
+## Create an App/Window
 
 **warning** : It's not recommended, it's deprecated, and just here to show that's like eel ... 
 
