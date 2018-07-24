@@ -21,7 +21,7 @@ It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
 **TODOs**:
 * Write docs & examples
 
-## to test/run
+## To Test/Run
 
 Download [the zip from here](https://github.com/manatlan/wuy/archive/master.zip)
 
