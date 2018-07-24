@@ -1,6 +1,6 @@
 ## Create a wuy app, in the old/eel style
 
-**warning** : It's not recommended, it's deprecated, and just here to show that's like eel ... [You should start with the new style] !(https://github.com/manatlan/wuy/blob/master/wiki/tuto.md)
+**warning** : It's not recommended, it's deprecated, and just here to show that's like eel ... [You should start with the new style](https://github.com/manatlan/wuy/blob/master/wiki/tuto.md) !
 
 Create a python file "web.py", and copy/paste this:
 
