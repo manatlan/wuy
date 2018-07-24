@@ -14,7 +14,7 @@ In **server mode** : it will act as a classical web server ; and you can use as 
 
 In all cases : it will be pretty easy to produce/freeze an executable/windows (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/COMPILE.bat). And share your _super python tool_ to the world.
 
-For **app/window mode**: the wuy/js will work like a charm in chrome. For **server mode**: you can add [polyfill](https://polyfill.io/v2/docs/) to be able to use a lot of older browser (ie11, etc ...), see the [tchat](https://github.com/manatlan/wuy/blob/master/web/tchat.html) server.
+For **app/window mode**: the wuy/js will work like a charm in chrome. For **server mode**: you can add [polyfill](https://polyfill.io/v2/docs/) to be able to use a lot of older browsers (IE11, etc ...), see the [tchat](https://github.com/manatlan/wuy/blob/master/web/tchat.html) server.
 
 It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
 
