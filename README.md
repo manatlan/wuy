@@ -44,7 +44,7 @@ Install the lib :
 
     $ pip3 install wuy winreg
 
-(_winreg__ is needed for windows only)
+(_winreg_ is needed for windows only)
 
 
 See the [old style (like Eel)](https://github.com/manatlan/wuy/blob/master/wiki/old.md)
