@@ -41,3 +41,5 @@ and rerun your script :
     $ python3 web.py
 
 and you can start to code
+
+**TIP** : if you want the server mode (aka : use many clients from anywhere) ; just replace _wuy.Window_ by _wuy.Server_ !
