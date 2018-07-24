@@ -18,3 +18,4 @@ class index(wuy.Window):    # name the class as the web/<class_name>.html
 
 if __name__=="__main__":
     index()
+    

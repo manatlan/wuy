@@ -1,10 +1,8 @@
 <script src="wuy.js"></script>
 
 What's your name ?
-<input id="txt"/><button onclick="post()">OK</button>
+<form onsubmit="wuy.post( this.txt.value ); return false">
+    <input name="txt"/>
+    <input type="submit" value="ok"/>
+</form>
 
-<script>
-    function post() {
-        wuy.post( document.getElementById("txt").value )
-    }
-</script>
