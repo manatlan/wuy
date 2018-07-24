@@ -1,7 +1,5 @@
 ## Create an App/Window
 
-**warning** : It's not recommended, it's deprecated, and just here to show that's like eel ... 
-
 Create a python file "web.py", and copy/paste this:
 
 ```python
