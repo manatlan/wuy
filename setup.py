@@ -17,8 +17,10 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
         "Operating System :: OS Independent",
     ),
+    python_requires='>=3.5',
     install_requires=[
           'aiohttp',
           #~ 'winreg;platform_system=="Windows"'    (doesn't work on w10 ?!)
     ],
+    keywords=['gui', 'html', 'javascript', 'electron', "asyncio", "aiohttp", "websocket"],
 )
