@@ -5,7 +5,7 @@ Create a python file "web.py", and copy/paste this:
 ```python
 import wuy
 
-class index(wuy.Window)
+class index(wuy.Window):
     pass
 
 index()
@@ -28,7 +28,7 @@ Edit "web.py", like this :
 ```python
 import wuy
 
-class index(wuy.Window)
+class index(wuy.Window):
     size=(640,480)
     def myadd(self, a,b):
         return a+b
