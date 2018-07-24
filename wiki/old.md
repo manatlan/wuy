@@ -37,4 +37,11 @@ and rerun your script :
 
     $ python3 web.py
 
-and you can start to code
+It's really like [python eel](https://github.com/ChrisKnott/Eel), but [you should start with the new style] (https://github.com/manatlan/wuy/blob/master/wiki/tuto.md) if you want to go with **wuy**.
+
+If you want to migrate from eel to wuy :
+
+* Pay attention on calling rpc methods : _eel.myadd(42,13)( alert _) -> _wuy.myadd(42,13).then( alert )_ (wuy use classic promises (catch'able))
+* On py side : replace _eel_ by _wuy_.
+* On js side : you can't expose JS method to python : you should use the pubsub mechanism (JS: _wuy.on("event",callback)_ / PY: _wuy.emit("event", *args)_ ). (Keep in mind ; that in server mode : you can have multiple clients, so calling a js from py side is a non-sense).
+* On js side : rename _eel.js_ -> _wuy.js_
