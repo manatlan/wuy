@@ -28,6 +28,8 @@ Download [the zip from here](https://github.com/manatlan/wuy/archive/master.zip)
     $ pip3 install aiohttp
     $ python3 -u simple.py
 
+(on windows : _pip3.exe install winreg aiohttp_)
+
 or the new way of doing things, for app/window:
 
     $ python3 -u an_app.py
