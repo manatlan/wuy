@@ -69,6 +69,6 @@ With [wuy.Window](https://github.com/manatlan/wuy/blob/master/wiki/api_py_window
 
 With [wuy.Server](https://github.com/manatlan/wuy/blob/master/wiki/api_py_server.md) for classic http/ws servers
 
-And on the frontend, in all case, in javascript use [wuy.js](https://github.com/manatlan/wuy/blob/master/wiki/api_js.md)
+And client side (javascript), in all cases : use [wuy.js](https://github.com/manatlan/wuy/blob/master/wiki/api_js.md)
 
 [Learn More on differences between this two class](https://github.com/manatlan/wuy/blob/master/wiki/diff.md)
