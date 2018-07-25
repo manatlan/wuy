@@ -12,5 +12,6 @@ Depending of your class inheritance
 | Browser | Chrome, in **chrome app mode**. If chrome is not present : will fallback to server mode (listening localhost only, and the next free port) | any browsers from worldwild|
 | Host listening | only localhost | wide (0.0.0.0) |
 | Port listening | Will use the defined port or the default, but will try next ports if it can't use it | Will use the defined port or the default. If the port is not available ; it will not start ! (like a regular server) |
+| using wuy.emit(event) on client side | do nothing | Will send the event to all others connected clients (except self) |
 
 
