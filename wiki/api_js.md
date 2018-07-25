@@ -13,7 +13,7 @@ Subscribe to an event
   * **callback** : a javascript method which handle params received by the event
   
 ---
-#### wuy.--method--( --args-- )
+#### wuy.--method--( --arg--, --arg--, ... ) -> Promise
 Call the serverside rpc method defined in your wuy.Window ou wuy.Server
 
 ---
