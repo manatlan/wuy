@@ -25,8 +25,8 @@ Will exit the current instance
 ---
 #### attribut size
 Set the size of the window. size can be a tuple (width,height) or None
----
 
+---
 Like the other mode ; just inherit of this class and declare your rpc method (sync or async style), to let them available in the js side.
 
 
