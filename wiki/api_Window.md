@@ -11,8 +11,8 @@ The constructor will run the GUI (and start the web/ws server).
 ---
 #### method emit( event, args )
 Will send an event from the server to the client
-  * **event** : [string] (default 8080) define your port, but if it's already in use : **wuy** will try the next free port to run the server part.
-  * **args** : [list] (defaut True) display, or not, the log in the current console.
+  * **event** : [string] the name of the event to send
+  * **args** : [list] A list of arguments to send with the event
 
 ---
 #### method init()
