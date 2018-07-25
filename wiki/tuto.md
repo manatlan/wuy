@@ -1,5 +1,7 @@
 ## Create an App/Window
 
+In this tutorial : we will create a GUI which will provide a button whose will do a simple addition of two numbers (in python side).
+
 Create a python file "web.py", and copy/paste this:
 
 ```python
@@ -40,6 +42,8 @@ and rerun your script :
 
     $ python3 web.py
 
-and you can start to code
+and you can start to build your wonderful GUI ;-)
 
 **TIP** : if you want the server mode (aka : use many clients from anywhere) ; just replace _wuy.Window_ by _wuy.Server_ !
+
+[Learn More on differences between window & server modes](https://github.com/manatlan/wuy/blob/master/wiki/diff.md)
