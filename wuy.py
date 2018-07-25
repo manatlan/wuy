@@ -25,7 +25,7 @@ import types
 import base64
 
 
-__version__="0.5.1"
+__version__="0.5.2"
 
 DEFAULT_PORT=8080
 
@@ -325,6 +325,7 @@ class Base:
         if app:
             url = "http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex)
             isBrowser = openApp(url)
+            host="localhost"
             if isBrowser:
                 self._closeIfSocketClose=True
             else:
@@ -334,6 +335,8 @@ class Base:
 
             if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
                 self._size=app
+        else:
+            host="0.0.0.0"
 
         self.init()
 
@@ -347,9 +350,9 @@ class Base:
             ])
             try:
                 if self._closeIfSocketClose: # app-mode, don't shout "server started,  Running on, ctrl-c"
-                    web.run_app(application,port=port,print=lambda *a,**k: None)
+                    web.run_app(application,host=host,port=port,print=lambda *a,**k: None)
                 else:
-                    web.run_app(application,port=port)
+                    web.run_app(application,host=host,port=port)
             except KeyboardInterrupt:
                 exit()
 
