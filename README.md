@@ -18,9 +18,9 @@ In **app/window mode** : it will manage (open/close) the window for you ; using 
 
 In **server mode** : it will act as a classical web server ; and you can use as many clients/browsers as you want, from localhost or from anywhere else. Closing a socket ; just close the socket ;-). It can be hosted on the web, as long as the provider service use python3.
 
-In all cases : it will be pretty easy to produce/freeze an executable/windows (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/BUILD.bat). And share your _super python tool_ to the world.
+[More on differences](https://github.com/manatlan/wuy/blob/master/wiki/diff.md)
 
-For **app/window mode**: the wuy/js will work like a charm in chrome. For **server mode**: you can add [polyfill](https://polyfill.io/v2/docs/) to be able to use a lot of older browsers (IE11, etc ...), see the [tchat](https://github.com/manatlan/wuy/blob/master/web/tchat.html) server.
+In all cases : it will be pretty easy to produce/freeze an executable/windows (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/BUILD.bat). And share your _super python tool_ to the world.
 
 It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
 
@@ -69,3 +69,4 @@ with **wuy.Window** for app (which open/manage a chrome window app)
 
 with **wuy.Server** for classic http/ws servers
 
+[Learn More on differences between this two class](https://github.com/manatlan/wuy/blob/master/wiki/diff.md)
