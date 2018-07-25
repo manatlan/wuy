@@ -4,7 +4,7 @@ Depending of your class inheritance
 
 | | wuy.Window | wuy.Server |
 |:-:|:-:|:-:|
-[ mode | App/Window | Server |
+| mode | App/Window | Server |
 | At open | Open GUI in a managed chrome app | no |
 | At end | Close the window/gui | no end (except ctrl-c on server-side, like a regular server) |
 | Can exit on its own ?| Using self.exit() | no (except ctrl-c on server-side, like a regular server) |
