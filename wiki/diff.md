@@ -16,4 +16,4 @@ Depending of your class inheritance
 | Port listening | Will use the defined/default port, or the next free port available | Will use the defined/default port. If the port is not available ; it will not start ! (like a regular server) |
 | using wuy.emit(event) on client side | do nothing | Will send the event to all others connected clients (except self) |
 
-* : in a future release : **wuy** will embbed its promise polyfill.
+(*) : in a future release : **wuy** will embbed its promise polyfill.
