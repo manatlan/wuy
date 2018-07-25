@@ -16,7 +16,7 @@ Run it, like this :
 
     $ python3 web.py
 
-It will create a "web/index.html", the defaut front-end ;-)
+It will create a "web/index.html", the default front-end template ;-)
 
 Edit "web/index.html", like this :
 
