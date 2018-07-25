@@ -11,8 +11,9 @@ Depending of your class inheritance
 | Can exit on its own ?| Using self.exit() | no (except ctrl-c on server-side, like a regular server) |
 | If socket brokes | Close the window/app | clients retry to reconnect (like a regular server) |
 | Websocket | Only one (think one client) | as many as clients |
-| Browser | Chrome, in **chrome app mode**. If chrome is not present : will fallback to server mode (listening localhost only, and the next free port) | Any browsers from world wild. But you'll better Need to use the wonderful [polyfill](https://polyfill.io/v2/docs/) to be able to serve old browsers (IE11, etc ...). Because wuy.js use Promise|
+| Browser | Chrome, in **chrome app mode**. If chrome is not present : will fallback to server mode (listening localhost only, and the next free port) | Any browsers from world wild. But you'll better Need to use the wonderful [polyfill](https://polyfill.io/v2/docs/) to be able to serve old browsers (IE11, etc ...). Because wuy.js use Promise (ù)|
 | Host listening | only localhost | wide (0.0.0.0) |
 | Port listening | Will use the defined/default port, or the next free port available | Will use the defined/default port. If the port is not available ; it will not start ! (like a regular server) |
 | using wuy.emit(event) on client side | do nothing | Will send the event to all others connected clients (except self) |
 
+* : in a future release : **wuy** will embbed its promise polyfill.
