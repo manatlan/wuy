@@ -5,7 +5,7 @@ Depending of your class inheritance
 | | wuy.Window | wuy.Server |
 |:-:|:-:|:-:|
 | aka mode | App/Window | Server |
-| act as | Real GUI (your clients won't see any diffence) | Regular Web Server, it's up to you to connect to it with browser of your choice |
+| act as | Real GUI (your clients won't see any difference) | Regular Web Server, it's up to you to connect to it with browser of your choice |
 | At open | Open GUI in a managed chrome app | no |
 | At end | Close the window/gui | no end (except ctrl-c on server-side, like a regular server) |
 | Can exit on its own ?| Using self.exit() | no (except ctrl-c on server-side, like a regular server) |
