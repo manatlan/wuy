@@ -2,7 +2,9 @@
 To let your wuy application act as a regular web server
 
 ---
+<span color="blue>
 #### wuy.Window(port=DEFAULT_PORT, log=True, ** kwargs) : constructor
+             </span>
 The constructor will start the web/ws server
   * **port** : [int] (default 8080) define your port.
   * **log** : [boolean] (defaut True) display, or not, the log in the current console.
