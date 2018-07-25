@@ -23,9 +23,9 @@ import uuid
 import inspect
 import types
 import base64
+import socket
 
-
-__version__="0.5.2"
+__version__="0.5.3"
 
 DEFAULT_PORT=8080
 
@@ -45,6 +45,17 @@ def expose( f ):    # decorator !
     global exposed
     exposed[f.__name__]=f
     return f
+
+def isFree(ip,port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(("127.0.0.1", int(port)))
+        return True
+    except socket.error as e:
+        return False
+    finally:
+        s.close()
+
 
 def path(f):
     if hasattr(sys,"_MEIPASS"): # when freezed with pyinstaller ;-)
@@ -323,9 +334,10 @@ class Base:
             print("Create 'web/%s', just edit it" % os.path.basename(startpage))
 
         if app:
-            url = "http://localhost:%s/%s?%s"% (port,page,uuid.uuid4().hex)
-            isBrowser = openApp(url)
             host="localhost"
+            while not isFree(host,port): port+=1
+            url = "http://%s:%s/%s?%s"% (host,port,page,uuid.uuid4().hex)
+            isBrowser = openApp(url)
             if isBrowser:
                 self._closeIfSocketClose=True
             else:
@@ -352,7 +364,11 @@ class Base:
                 if self._closeIfSocketClose: # app-mode, don't shout "server started,  Running on, ctrl-c"
                     web.run_app(application,host=host,port=port,print=lambda *a,**k: None)
                 else:
-                    web.run_app(application,host=host,port=port)
+                    if isFree(host,port):
+                        web.run_app(application,host=host,port=port)
+                    else:
+                        print("ERROR: Port(%s) is already in use !"%port)
+                        sys.exit(-1)
             except KeyboardInterrupt:
                 exit()
 
