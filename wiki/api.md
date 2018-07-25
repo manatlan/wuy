@@ -20,7 +20,7 @@ Override this method to initialize your needs.
 #### method exit()
 Will exit the current instance
 
-### attribut size
+#### attribut size
 Set the size of the window. size can be a tuple (width,height) or None
 
 
