@@ -13,9 +13,10 @@ Subscribe to an event
   * **callback** : a javascript method which handle params received by the event
   
 ---
-#### wuy.<method>( <args> )
+#### wuy.--method--( --args-- )
 Call the serverside rpc method defined in your wuy.Window ou wuy.Server
 
+---
 By the way, you can access to the variables declared (kwargs) in the constructor of your wuy application.
 
 If you have declared, in python side :
@@ -29,7 +30,7 @@ myApp( myVar=42 )
 You can access it on js side:
 
 ```javascript
-console.log( wuy.mYvar )
+console.log( wuy.myVar === 42 ) // it's true
 ```
 
 
