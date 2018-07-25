@@ -18,7 +18,7 @@ In **app/window mode** : it will manage (open/close) the window for you ; using 
 
 In **server mode** : it will act as a classical web server ; and you can use as many clients/browsers as you want, from localhost or from anywhere else. Closing a socket ; just close the socket ;-). It can be hosted on the web, as long as the provider service use python3.
 
-[More on differences](https://github.com/manatlan/wuy/blob/master/wiki/diff.md)
+[More on window/server differences](https://github.com/manatlan/wuy/blob/master/wiki/diff.md)
 
 In all cases : it will be pretty easy to produce/freeze an executable/windows (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/BUILD.bat). And share your _super python tool_ to the world.
 
