@@ -25,7 +25,7 @@ import types
 import base64
 import socket
 
-__version__="0.5.3"
+__version__="0.5.4"
 
 DEFAULT_PORT=8080
 
@@ -335,7 +335,9 @@ class Base:
 
         if app:
             host="localhost"
-            while not isFree(host,port): port+=1
+            if application is None: 
+                while not isFree(host,port): 
+                    port+=1
             url = "http://%s:%s/%s?%s"% (host,port,page,uuid.uuid4().hex)
             isBrowser = openApp(url)
             if isBrowser:
