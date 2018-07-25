@@ -52,9 +52,9 @@ Install the lib :
 
 (_winreg_ is needed for windows only)
 
-and follow the [official tuto](https://github.com/manatlan/wuy/blob/master/wiki/README.md) (new style).
+**And follow the [official tuto](https://github.com/manatlan/wuy/blob/master/wiki/README.md)**.
 
-(FYI, only, see the [old style (like Eel)](https://github.com/manatlan/wuy/blob/master/wiki/old.md) **--DEPRECATED--**)
+(FYI only ; see the [old style (like Eel)](https://github.com/manatlan/wuy/blob/master/wiki/old.md))
 
 ## See Examples
 
