@@ -15,6 +15,7 @@
 # #############################################################################
 
 from aiohttp import web
+import aiohttp
 import asyncio
 import json,sys,os
 import webbrowser
@@ -25,7 +26,7 @@ import types
 import base64
 import socket
 
-__version__="0.5.4"
+__version__="0.6"
 
 DEFAULT_PORT=8080
 
@@ -107,6 +108,28 @@ def openApp(url):
         else:
             return chrome._invoke(["--app="+url],1,1)
 
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+jar = aiohttp.CookieJar(unsafe=True)
+
+class Response:
+    def __init__(self,status,data=None,headers={}):
+        self.status=status
+        self.headers=dict(headers)
+        self.content=data
+
+async def request(url,data=None,headers={}):    # mimic urllib.Request() (GET & POST only)
+    async with aiohttp.ClientSession(cookie_jar=jar) as session:
+        try:
+            if data:
+                async with session.post(url,data=data,headers=headers,ssl=False) as resp:
+                    return Response(resp.status,await resp.text(), resp.headers)
+            else:
+                async with session.get(url,headers=headers,ssl=False) as resp:
+                    return Response(resp.status,await resp.text(), resp.headers)
+        except aiohttp.client_exceptions.ClientConnectorError as e:
+            return Response(None,str(e))
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 
 # Async aiohttp things (use current)
 #############################################################
@@ -121,8 +144,16 @@ async def asEmit(event,args,exceptMe=None):
         if id(ws) != id(exceptMe):
             await wsSend(ws,event=event, args=args )
 
-async def handleWeb(request): # serve all statics from web folder
-    file = path('./web/'+request.match_info.get('path', "index.html"))
+async def handleProxy(req): # proxify "/_/<url>" with headers starting with "set-"
+    url = req.match_info.get("url",None)
+    if req.query_string: url=url+"?"+req.query_string
+    headers={ k[4:]:v for k,v in req.headers.items() if k.lower().startswith("set-")}
+    r=await request( url, data=req.has_body and (await req.text()),headers=headers )
+    log(". serve proxy url",url,headers,":",r.status)
+    return web.Response(status=r.status or 0,text=r.content, headers=r.headers)
+
+async def handleWeb(req): # serve all statics from web folder
+    file = path('./web/'+req.match_info.get('path', "index.html"))
     if os.path.isfile(file):
         log("- serve static file",file)
         return web.FileResponse(file)
@@ -130,7 +161,8 @@ async def handleWeb(request): # serve all statics from web folder
         log("! 404 on",file)
         return web.Response(status=404,body="file not found")
 
-async def handleJs(request): # serve the JS
+
+async def handleJs(req): # serve the JS
     log("- serve wuy.js",current._size and ("(with resize to "+str(current._size)+")") or "")
 
     name=os.path.basename(sys.argv[0])
@@ -201,7 +233,18 @@ var wuy={
             return new Promise( function (resolve, reject) {
                 reject("not connected");
             })
-    }
+    },
+    fetch: function(url,obj) {
+        var h={"cache-control": "no-cache"};    // !!!
+        if(obj && obj.headers)
+            Object.keys(obj.headers).forEach( function(k) {
+                h["set-"+k]=obj.headers[k];
+            })
+        var newObj = Object.assign({}, obj)
+        newObj.headers=h;
+        newObj.credentials= 'same-origin';
+        return fetch( "/_/"+url,newObj )
+    },
 };
 """ % (
         current._size and "window.resizeTo(%s,%s);"%(current._size[0],current._size[1]) or "",
@@ -219,10 +262,10 @@ var wuy={
 
     return web.Response(status=200,text=js)
 
-async def wshandle(request):
+async def wshandle(req):
     global current
     ws = web.WebSocketResponse()
-    await ws.prepare(request)
+    await ws.prepare(req)
 
     current._clients.append(ws)
     try:
@@ -335,8 +378,8 @@ class Base:
 
         if app:
             host="localhost"
-            if application is None: 
-                while not isFree(host,port): 
+            if application is None:
+                while not isFree(host,port):
                     port+=1
             url = "http://%s:%s/%s?%s"% (host,port,page,uuid.uuid4().hex)
             isBrowser = openApp(url)
@@ -361,6 +404,7 @@ class Base:
                 web.get('/wuy.js',  handleJs),
                 web.get('/',        handleWeb),
                 web.get('/{path}',  handleWeb),
+                web.route("*",'/_/{url:.+}',handleProxy),
             ])
             try:
                 if self._closeIfSocketClose: # app-mode, don't shout "server started,  Running on, ctrl-c"
