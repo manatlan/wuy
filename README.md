@@ -22,6 +22,8 @@ In **server mode** : it will act as a classical web server ; and you can use as 
 
 In all cases : it will be pretty easy to produce/freeze an executable/windows (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/BUILD.bat). And share your _super python tool_ to the world.
 
+Since 0.6; **wuy** provide a js method to [proxify http requests](https://github.com/manatlan/wuy/blob/master/wiki/proxify.md), to avoid CORS troubles.
+
 It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
 
 **TODOs**:
