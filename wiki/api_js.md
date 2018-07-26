@@ -11,7 +11,11 @@ Will send an event from the client to others clients, except self. It returns a 
 Subscribe to an event.
   * **event** : [string] the name of the event
   * **callback** : a javascript method which handle params received by the event
-  
+
+---
+#### wuy.fetch( url, obj ) -> Promise
+Exactly as window.fetch(), but proxified thru serverside ([learn more](https://github.com/manatlan/wuy/blob/master/wiki/proxify.md))
+
 ---
 #### wuy.--method--( --arg--, --arg--, ... ) -> Promise
 Call the serverside rpc method defined in your wuy.Window ou wuy.Server. Otherwise, it rejects with the error.
