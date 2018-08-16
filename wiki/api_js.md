@@ -1,10 +1,10 @@
 # On Javascript Side
 
 ---
-#### wuy.emit( event, args ) -> Promise
+#### wuy.emit( event, arg1, arg2, ... ) -> Promise
 Will send an event from the client to others clients, except self. It returns a Promise which resolve (with the params of the event) if the event as been sent to others. Otherwise, it rejects with the error.
   * **event** : [string] the name of the event
-  * **args** : [list] a list of object
+  * **args** : arguments sent with the event
 
 ---
 #### wuy.on( event, callback )

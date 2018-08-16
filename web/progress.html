@@ -1,0 +1,32 @@
+<script src="wuy.js"></script>
+<style>
+body {background: #EEE}
+.pb {
+    border:1px solid black;
+    background:white;
+}
+.pb div {
+    background:blue;
+    height:20%;
+    width:0px;
+}
+</style>
+
+<button onclick="run(this,'p1',0.1)">Go</button>
+<div class="pb" id="p1"><div></div></div>
+
+<button onclick="run(this,'p2',0.05)">Go</button>
+<div class="pb" id="p2"><div></div></div>
+
+<script>
+    function run(b,pb,speed) {
+        b.disabled=true;
+        wuy.doTheJob(pb,speed).then( m=>{
+            b.disabled=false;
+            console.log(m);
+        })        
+    }
+    wuy.on("percent", function( pb,percent ) {
+        document.querySelector("#"+pb+" div").style.width=percent+"%";
+    })
+</script>

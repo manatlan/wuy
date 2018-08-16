@@ -26,7 +26,7 @@ import types
 import base64
 import socket
 
-__version__="0.6"
+__version__="0.6.1"
 
 DEFAULT_PORT=8080
 
@@ -203,10 +203,11 @@ function setupWS( cbCnx ) {
 var wuy={
     _ws: setupWS( function(ws){wuy._ws = ws} ),
     on: function( evt, callback ) {     // to register an event on a callback
-        document.addEventListener(evt,function(e) { callback(e.detail) })
+        document.addEventListener(evt,function(e) { callback(...e.detail) })
     },
     emit: function( evt, data) {        // to emit a event to all clients (except me), return a promise when done
-        return wuy._call("emit", [evt,data])
+        var args=Array.prototype.slice.call(arguments)
+        return wuy._call("emit", args)
     },
     _call: function( method, args ) {
         var cmd={
@@ -315,7 +316,7 @@ async def wshandle(req):
     if current._closeIfSocketClose: exit()
     return ws
 
-def emit(event,args):   # sync version of emit for py side !
+def emit(event,*args):   # sync version of emit for py side !
     asyncio.ensure_future( asEmit( event, args) )
 
 def exit():         # exit method
@@ -410,11 +411,7 @@ class Base:
                 if self._closeIfSocketClose: # app-mode, don't shout "server started,  Running on, ctrl-c"
                     web.run_app(application,host=host,port=port,print=lambda *a,**k: None)
                 else:
-                    if isFree(host,port):
-                        web.run_app(application,host=host,port=port)
-                    else:
-                        print("ERROR: Port(%s) is already in use !"%port)
-                        sys.exit(-1)
+                    web.run_app(application,host=host,port=port)
             except KeyboardInterrupt:
                 exit()
 

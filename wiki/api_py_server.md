@@ -9,10 +9,10 @@ The constructor will start the web/ws server
   * **kwargs** : to initialise the instance with its own variables. They will be availables on client side (ex: _wuy.my_var_), and on python side (_self.my_var_).
 
 ---
-#### method emit( event, args )
+#### method emit( event, arg1, arg2, ... )
 Will send an event from the server to the client
   * **event** : [string] the name of the event to send
-  * **args** : [list] A list of arguments to send with the event
+  * **args** : arguments to send with the event
 
 ---
 #### method init()
