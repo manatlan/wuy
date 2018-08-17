@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-import wuy
+import wuy,re
 
-# it's the future ... (call a http service during an async rpc method call)
+# call a http service during an async rpc method call
 
 class fetch(wuy.Window):    # name the class as the web/<class_name>.html
-    size=(400,400)
+    size=wuy.FULLSCREEN
 
-    async def requestWeb(self,url):
-        return (await wuy.request(url)).content # use wuy.request(url,data=None,headers={})
+    async def feed(self):
+        r=(await wuy.request("https://www.reddit.com/r/pics/.rss")).content
+        return re.findall("https://i.redd.it/[^\.]+\....",r)
 
 if __name__=="__main__":
-    fetch()
+    fetch() # CTRL-W or alt-f4 to quit !
 
 
 
