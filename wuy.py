@@ -25,8 +25,10 @@ import inspect
 import types
 import base64
 import socket
+import tempfile
+from threading import Thread
 
-__version__="0.6.1"
+__version__="0.6.2"
 
 DEFAULT_PORT=8080
 
@@ -102,11 +104,15 @@ def find_chrome_mac():
 def openApp(url):
     chrome=getChrome()
     if chrome:
+        args=["--app="+url]
+        if tempfile.gettempdir():
+            args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
         if isinstance(chrome,webbrowser.GenericBrowser):
-            chrome.args=["--app="+url]
+            chrome.args=args
             return chrome.open(url, new=1, autoraise=True)
         else:
-            return chrome._invoke(["--app="+url],1,1)
+            return chrome._invoke(args,1,1)
+            
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 jar = aiohttp.CookieJar(unsafe=True)
@@ -267,7 +273,6 @@ async def wshandle(req):
     global current
     ws = web.WebSocketResponse()
     await ws.prepare(req)
-
     current._clients.append(ws)
     try:
         async for msg in ws:
@@ -308,7 +313,7 @@ async def wshandle(req):
                 if "uuid" in o: r["uuid"]=o["uuid"]
 
                 await wsSend(ws, **r )
-            elif msg.type == web.WSMsgType.close:
+            elif msg.type == web.WSMsgType.close or msg.tp == web.WSMsgType.error:
                 break
     finally:
         current._clients.remove( ws )
@@ -333,6 +338,7 @@ def exit():         # exit method
     asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
 
     log("exit")
+    sys.exit(0)
 
 # WUY routines
 #############################################################
@@ -378,18 +384,21 @@ class Base:
             print("Create 'web/%s', just edit it" % os.path.basename(startpage))
 
         if app:
+            self._closeIfSocketClose=True
             host="localhost"
             if application is None:
                 while not isFree(host,port):
                     port+=1
             url = "http://%s:%s/%s?%s"% (host,port,page,uuid.uuid4().hex)
-            isBrowser = openApp(url)
-            if isBrowser:
-                self._closeIfSocketClose=True
-            else:
-                print("Can't find Chrome on your desktop ;-(")
-                print("(Switch to server mode)")
-                print("Surf to %s !" % url)
+
+            def runApp(url):
+                ok=openApp(url)
+                if not ok:
+                    print("Can't find Chrome on your desktop ;-(")
+                    os._exit(-1)
+
+            t = Thread(target=runApp, args=(url,))
+            t.start()   #TODO: what to do if no browser is launcher ???
 
             if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
                 self._size=app
