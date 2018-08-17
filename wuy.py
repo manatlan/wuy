@@ -28,12 +28,13 @@ import socket
 import tempfile
 from threading import Thread
 
-__version__="0.6.2"
+__version__="0.6.3"
 
 DEFAULT_PORT=8080
 
 application=None
 current=None    # the current instance of Base
+FULLSCREEN="fullscreen" # const !
 
 try:
     import uvloop
@@ -101,10 +102,11 @@ def find_chrome_mac():
     if os.path.exists(default_dir):
         return default_dir
 
-def openApp(url):
+def openApp(url,fullScreen=False):
     chrome=getChrome()
     if chrome:
         args=["--app="+url]
+        if fullScreen: args.append("--start-fullscreen")
         if tempfile.gettempdir():
             args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
         if isinstance(chrome,webbrowser.GenericBrowser):
@@ -343,6 +345,8 @@ def exit():         # exit method
 # WUY routines
 #############################################################
 class Base:
+    FULLSCREEN="fullscreen"
+
     _routes={}
     _clients=[]
     _closeIfSocketClose=False
@@ -391,8 +395,11 @@ class Base:
                     port+=1
             url = "http://%s:%s/%s?%s"% (host,port,page,uuid.uuid4().hex)
 
+            if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
+                self._size=app
+
             def runApp(url):
-                ok=openApp(url)
+                ok=openApp(url,app==FULLSCREEN)
                 if not ok:
                     print("Can't find Chrome on your desktop ;-(")
                     os._exit(-1)
@@ -400,8 +407,6 @@ class Base:
             t = Thread(target=runApp, args=(url,))
             t.start()   #TODO: what to do if no browser is launcher ???
 
-            if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
-                self._size=app
         else:
             host="0.0.0.0"
 

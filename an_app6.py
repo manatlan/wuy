@@ -5,6 +5,8 @@ import asyncio
 # Simulate long running process with progress bar client side
 
 class progress(wuy.Window):    # name the class as the web/<class_name>.html
+
+    # size=wuy.FULLSCREEN
     size=(500,200)
 
     async def doTheJob(self,pb,speed):
