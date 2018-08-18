@@ -28,7 +28,7 @@ import socket
 import tempfile
 from threading import Thread
 
-__version__="0.6.3"
+__version__="0.6.4"
 
 DEFAULT_PORT=8080
 
