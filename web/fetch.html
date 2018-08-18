@@ -11,6 +11,18 @@ setTimeout(function() {     //TODO: found a better way ;-)
         list=ll;
         set(0)
     })
+
+    ////===================================================
+    //// the same ^, using wuy.fetch()
+    //// (not possible with window.fetch, coz CORS trouble)
+    ////===================================================
+    // wuy.fetch("https://www.reddit.com/r/pics/.rss")
+    //     .then( x=>{return x.text()} )
+    //     .then( x=>{
+    //         list=x.match(/https:..i\.redd\.it\/[^\.]+\..../g)
+    //         set(0)
+    //     })
+    ////===================================================
 },200)
 
 function set(n) {
