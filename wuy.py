@@ -209,7 +209,7 @@ function setupWS( cbCnx ) {
 }
 
 var wuy={
-    _ws: setupWS( function(ws){wuy._ws = ws} ),
+    _ws: setupWS( function(ws){wuy._ws = ws; document.dispatchEvent( new CustomEvent("init") )} ),
     on: function( evt, callback ) {     // to register an event on a callback
         document.addEventListener(evt,function(e) { callback(...e.detail) })
     },

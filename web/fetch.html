@@ -6,7 +6,8 @@ div {position:fixed;top:10px;right:20px;z-index:2;cursor:pointer;color:red;font-
 <script>
 var list=[],N;
 
-setTimeout(function() {     //TODO: found a better way ;-)
+document.addEventListener("init",function() { // published when socket is connected !
+
     wuy.feed().then( ll=>{
         list=ll;
         set(0)
@@ -14,7 +15,7 @@ setTimeout(function() {     //TODO: found a better way ;-)
 
     ////===================================================
     //// the same ^, using wuy.fetch()
-    //// (not possible with window.fetch, coz CORS trouble)
+    //// (not possible with the classic window.fetch, coz CORS trouble)
     ////===================================================
     // wuy.fetch("https://www.reddit.com/r/pics/.rss")
     //     .then( x=>{return x.text()} )
@@ -23,7 +24,9 @@ setTimeout(function() {     //TODO: found a better way ;-)
     //         set(0)
     //     })
     ////===================================================
-},200)
+
+})
+
 
 function set(n) {
     N=n;

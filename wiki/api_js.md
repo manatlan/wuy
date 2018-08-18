@@ -17,8 +17,12 @@ Subscribe to an event.
 Exactly as window.fetch(), but proxified thru serverside ([learn more](https://github.com/manatlan/wuy/blob/master/wiki/proxify.md))
 
 ---
-#### wuy.--method--( --arg--, --arg--, ... ) -> Promise
+#### wuy.--method--( arg1, arg2, ... ) -> Promise
 Call the serverside rpc method defined in your wuy.Window ou wuy.Server. Otherwise, it rejects with the error.
+
+---
+#### event 'init'
+This event is published when the socket is connected, and the magic cant start !. Just declare your subscription with a classic `document.addEventListener("init",function() { /* your code */ })`
 
 ---
 By the way, you can access to the variables declared (kwargs) in the constructor of your wuy application.
