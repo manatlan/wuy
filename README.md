@@ -34,15 +34,13 @@ It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
 Download [the zip from here](https://github.com/manatlan/wuy/archive/master.zip)
 
     $ pip3 install aiohttp winreg
-    $ python3 -u simple.py
+    $ python3 -u an_app.py
 
 (_winreg_ is needed for windows only)
 
-or the new way of doing things, for app/window:
+It's an app !
 
-    $ python3 -u an_app.py
-
-For the server 
+For a regular server example (many clients from anywhere on web)
 
     $ python3 -u a_server.py
 
@@ -56,7 +54,6 @@ Install the lib :
 
 **And follow the [official tuto](https://github.com/manatlan/wuy/blob/master/wiki/README.md)**.
 
-(FYI only ; see the [old style (like Eel)](https://github.com/manatlan/wuy/blob/master/wiki/old.md))
 
 ## See Examples
 
