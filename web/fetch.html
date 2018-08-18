@@ -1,7 +1,7 @@
 <script src="wuy.js"></script>
 <style>
-body,html,img {width:100%;height:100%;margin:0px;padding:0px}
-div {position:fixed;top:10px;right:20px;z-index:2;cursor:pointer;color:red;font-size:100px;font-family:sans-serif}
+body,html,img {width:100%;height:100%;margin:0px;padding:0px;cursor:pointer;}
+div {position:fixed;top:10px;right:20px;z-index:2;color:red;font-size:100px;font-family:sans-serif}
 </style>
 <script>
 var list=[];
@@ -10,7 +10,7 @@ document.addEventListener("init",function() { // published when socket is connec
 
     wuy.feed().then( ll=>{
         list=ll;
-        set()
+        change()
     })
 
     ////===================================================
@@ -21,17 +21,17 @@ document.addEventListener("init",function() { // published when socket is connec
     //     .then( x=>{return x.text()} )
     //     .then( x=>{
     //         list=x.match(/https:..i\.redd\.it\/[^\.]+\..../g)
-    //         set(0)
+    //         change()
     //     })
     ////===================================================
 
 })
 
 
-function set(n) {
+function change(n) {
     document.querySelector("#i").src=list[0];
     list.push( list.shift() )
 }
 </script>
-<img id="i" src="" onclick="set()"/>
+<img id="i" src="" onclick="change()"/>
 <div onclick="window.close()">X</div>   <!-- wuy.exit() one day !-->
