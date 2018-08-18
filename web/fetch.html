@@ -29,9 +29,8 @@ document.addEventListener("init",function() { // published when socket is connec
 
 
 function set(n) {
-    var u=list.shift();
-    list.push(u)
-    document.querySelector("#i").src=u;
+    document.querySelector("#i").src=list[0];
+    list.push( list.shift() )
 }
 </script>
 <img id="i" src="" onclick="set()"/>
