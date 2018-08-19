@@ -348,8 +348,6 @@ def exit():         # exit method
 # WUY routines
 #############################################################
 class Base:
-    FULLSCREEN="fullscreen"
-
     _routes={}
     _clients=[]
     _closeIfSocketClose=False
