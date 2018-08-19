@@ -363,7 +363,7 @@ class Base:
             self._routes=exposed
 
 
-    def _run(self,port=DEFAULT_PORT,app=None,log=True):   # start method (app can be True, (width,size), ...)
+    def _run(self,port=DEFAULT_PORT,app=None,log=True):   # start method (app can be True, (width,height), ...)
         global current,application
 
         try:
