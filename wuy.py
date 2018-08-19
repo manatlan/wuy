@@ -54,7 +54,7 @@ def expose( f ):    # decorator !
 def isFree(ip,port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        s.bind(("127.0.0.1", int(port)))
+        s.bind((ip, int(port)))
         return True
     except socket.error as e:
         return False
