@@ -37,8 +37,9 @@ current=None    # the current instance of Base
 FULLSCREEN="fullscreen" # const !
 
 try:
-    import uvloop
-    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+    if not getattr( sys, 'frozen', False ): #bypass uvloop in frozen app (wait pyinstaller hook)
+        import uvloop
+        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 except ModuleNotFoundError:
     pass
 
