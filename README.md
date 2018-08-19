@@ -62,6 +62,8 @@ Install the lib :
 * [an_app3](https://github.com/manatlan/wuy/blob/master/an_app3.py) : an alert box with autodeclared js vars (chain'able windows)!
 * [an_app4](https://github.com/manatlan/wuy/blob/master/an_app4.py) : using sync & async rpc calls !
 * [an_app5](https://github.com/manatlan/wuy/blob/master/an_app5.py) : using async aiohttp.get (request content from web) & FULLSCREEN mode
+* [an_app6](https://github.com/manatlan/wuy/blob/master/an_app6.py) : progress bars (async)
+* [an_app7](https://github.com/manatlan/wuy/blob/master/an_app7.py) : html is inside the docstring ! (**SIMPLEST**)
 * [an_appVuejs](https://github.com/manatlan/wuy/blob/master/an_appVuejs.py) : using a vuejs app (and  a continuous push from server to client)
 * [a_server](https://github.com/manatlan/wuy/blob/master/a_server.py) : a server, tchat service for multiple clients
 

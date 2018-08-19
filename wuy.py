@@ -28,7 +28,7 @@ import socket
 import tempfile
 from threading import Thread
 
-__version__="0.6.4"
+__version__="0.7.0"
 
 DEFAULT_PORT=8080
 
@@ -163,7 +163,9 @@ async def handleProxy(req): # proxify "/_/<url>" with headers starting with "set
 
 async def handleWeb(req): # serve all statics from web folder
     file = path('./web/'+req.match_info.get('path', "index.html"))
-    if os.path.isfile(file):
+    if current and "/%s."%current._name in file and current.__doc__ is not None:
+        return web.Response(status=200,body='<script src="wuy.js"></script>\n'+current.__doc__,content_type="text/html")
+    elif os.path.isfile(file):
         log("- serve static file",file)
         return web.FileResponse(file)
     else:
@@ -362,6 +364,7 @@ class Base:
             self._name=instance # aka page name
             self._routes=exposed
 
+
     def _run(self,port=DEFAULT_PORT,app=None,log=True):   # start method (app can be True, (width,size), ...)
         global current,application
 
@@ -378,15 +381,18 @@ class Base:
 
         page=self._name+".html"
 
-        # create startpage if not present
-        startpage=path("./web/"+page)
-        if not os.path.isfile(startpage):
-            if not os.path.isdir(os.path.dirname(startpage)):
-                os.makedirs(os.path.dirname(startpage))
-            with open(startpage,"w+") as fid:
-                fid.write('''<script src="wuy.js"></script>\n''')
-                fid.write('''Hello Wuy'rld ;-)''')
-            print("Create 'web/%s', just edit it" % os.path.basename(startpage))
+        
+
+        # create startpage if not present and no docstring
+        if self.__doc__ is None:
+            startpage=path("./web/"+page)
+            if not os.path.isfile(startpage):
+                if not os.path.isdir(os.path.dirname(startpage)):
+                    os.makedirs(os.path.dirname(startpage))
+                with open(startpage,"w+") as fid:
+                    fid.write('''<script src="wuy.js"></script>\n''')
+                    fid.write('''Hello Wuy'rld ;-)''')
+                print("Create 'web/%s', just edit it" % os.path.basename(startpage))
 
         if app:
             self._closeIfSocketClose=True
