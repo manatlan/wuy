@@ -1,0 +1,1 @@
+This is a **du** frontend. It will display the size of files/folders, and you can navigate in your filesystem to spot the biggest. (Doesn't work on windows)
