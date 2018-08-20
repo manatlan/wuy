@@ -1,6 +1,6 @@
 # wuy 
 
-If you have made a _super python tool_, and you want to add a GUI but without using the biggest qt/gtk/tk/wx/kivy : you are in the right place ! Just re-use the local browser (chrome in app mode) as GUI, drived by **wuy**.
+If you have made a _super python tool_, and you want to add a GUI but without using qt/gtk/tk/wx/kivy/toga : you are in the right place ! Just re-use the local browser (chrome in app mode) as GUI, drived by **wuy**.
 
 <p align="center">
     <img src="https://github.com/manatlan/wuy/blob/master/wiki/capture.png"/><br/>
