@@ -28,7 +28,7 @@ import socket
 import tempfile
 from threading import Thread
 
-__version__="0.7.0"
+__version__="0.7.1"
 
 DEFAULT_PORT=8080
 
@@ -260,7 +260,7 @@ var wuy={
 };
 """ % (
         current._size and "window.resizeTo(%s,%s);"%(current._size[0],current._size[1]) or "",
-        'document.title="%s";'%name,
+        'if(!document.title) document.title="%s";'%name,
         current._closeIfSocketClose and "window.close()" or "setTimeout( function() {setupWS(cbCnx)}, 1000);"
     )
 
