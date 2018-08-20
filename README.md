@@ -83,6 +83,8 @@ Install the lib :
 * [an_appVuejs](https://github.com/manatlan/wuy/blob/master/an_appVuejs.py) : using a vuejs app (and  a continuous push from server to client)
 * [a_server](https://github.com/manatlan/wuy/blob/master/a_server.py) : a server, tchat service for multiple clients
 
+Don't forget to have a look at [real examples](https://github.com/manatlan/wuy/tree/master/examples) too (real apps for real life)
+
 With [wuy.Window](https://github.com/manatlan/wuy/blob/master/wiki/api_py_window.md) for app (which open/manage a chrome window app)
 
 With [wuy.Server](https://github.com/manatlan/wuy/blob/master/wiki/api_py_server.md) for classic http/ws servers
