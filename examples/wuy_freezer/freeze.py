@@ -23,8 +23,8 @@ class gui(wuy.Window):
     <div id="output"></div>
     <form onsubmit="wuy.select( this.path.value, this.inConsole.checked, this.addWeb.checked ); return false">
         Wuy Script<br/><input name="path" style="width:100%" disabled/><br/>
-        <label><input type="checkbox" name="inConsole"> Include its web folder</label><br/>
-        <label><input type="checkbox" name="addWeb"> With a output console</label><br/>
+        <label><input type="checkbox" name="addWeb"> Include its web folder</label><br/>
+        <label><input type="checkbox" name="inConsole"> With a output console</label><br/>
         <br/>
         <input type="submit" value="Build Exe"/>
     </form>
@@ -92,6 +92,7 @@ def build(path,inConsole=False,addWeb=False):
     params.append( "--distpath" )
     params.append( os.path.dirname(path) )
 
+    print( "PYINSTALLER:",params )
     pyi.run( params )
 
 
