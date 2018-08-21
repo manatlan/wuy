@@ -53,7 +53,7 @@ class gui(wuy.Window):
     </script>
     """
 
-    size=(400,360)
+    size=(400,400)
     path=None
     addWeb=False
     inConsole=False
