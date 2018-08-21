@@ -107,8 +107,7 @@ class ChromeApp:
             if fullScreen: args.append("--start-fullscreen")
             if tempfile.gettempdir():
                 args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
-            FNULL = open(os.devnull, 'w')
-            self.__instance = subprocess.Popen( args, close_fds=True, stdout=FNULL, stderr=subprocess.STDOUT )
+            self.__instance = subprocess.Popen( args, close_fds=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL )
         else:
             raise Exception("no browser")
 
