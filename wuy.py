@@ -123,10 +123,11 @@ class ChromeApp:
 class ChromeAppCef:
     def __init__(self,url,size=None):
         from threading import Thread
-        def run(url):
+        def cefbrowser():
             from cefpython3 import cefpython as cef
 
             windowInfo = cef.WindowInfo()
+            windowInfo.windowName="CefPython3"
             if size==FULLSCREEN:
                 from screeninfo import get_monitors
                 x=get_monitors()[0]
@@ -137,11 +138,11 @@ class ChromeAppCef:
             sys.excepthook = cef.ExceptHook
 
             cef.Initialize()
-            b=cef.CreateBrowserSync(windowInfo,url=url,window_title="CefPython3")
-
+            b=cef.CreateBrowserSync(windowInfo,url=url)
             cef.MessageLoop()
             cef.Shutdown()
-        t = Thread(target=run, args=(url,))
+
+        t = Thread(target=cefbrowser)
         t.start()         
 ###############################################################
 
