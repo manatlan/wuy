@@ -26,9 +26,10 @@ Since 0.6; **wuy** provide a js method to [proxify http requests](https://github
 
 It's, a little bit, the same thing as [python eel](https://github.com/ChrisKnott/Eel).
 
-FYI : You can do the same thing as [cefpython](https://github.com/cztomczak/cefpython), by reusing your local chrome install.
+
 
 **TODOs**:
+* In the future : will use [cefpython3](https://github.com/cztomczak/cefpython) if it's present, else it will use the local chrome installation. (you could choose to force cef/local use) (you can already try ; modify _wuy.py_, replace ChromeApp() by ChromeAppCef())
 * Write docs & examples
 
 ## The simplest example
