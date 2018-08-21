@@ -26,9 +26,9 @@ import types
 import base64
 import socket
 import tempfile
-from threading import Thread
+import subprocess
 
-__version__="0.7.3"
+__version__="0.7.4"
 
 
 DEFAULT_PORT=8080
@@ -72,23 +72,6 @@ def path(f):
 def log(*a):
     if current and current._isLog: print(*a)
 
-def getChrome():
-    def getExe():
-        if sys.platform in ['win32', 'win64']:
-            return find_chrome_win()
-        elif sys.platform == 'darwin':
-            return find_chrome_mac()
-
-    exe=getExe()
-    if exe:
-        return webbrowser.GenericBrowser(exe)
-    else:
-        webbrowser._tryorder=['google-chrome','chrome',"chromium","chromium-browser"]
-        try:
-            return webbrowser.get()
-        except webbrowser.Error:
-            return None
-
 def find_chrome_win():
     import winreg #TODO: pip3 install winreg
     reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe'
@@ -104,19 +87,36 @@ def find_chrome_mac():
     if os.path.exists(default_dir):
         return default_dir
 
-def openApp(url,fullScreen=False):
-    chrome=getChrome()
-    if chrome:
-        args=["--app="+url]
-        if fullScreen: args.append("--start-fullscreen")
-        if tempfile.gettempdir():
-            args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
-        if isinstance(chrome,webbrowser.GenericBrowser):
-            chrome.args=args
-            return chrome.open(url, new=1, autoraise=True)
+class ChromeApp:
+    def __init__(self,url,fullScreen=False):
+        self.__instance=None
+
+        if sys.platform[:3] == 'win':
+            exe=find_chrome_win()
+        elif sys.platform == 'darwin':
+            exe=find_chrome_mac()
         else:
-            return chrome._invoke(args,1,1)
-            
+            webbrowser._tryorder=['google-chrome','chrome',"chromium","chromium-browser"]
+            try:
+                exe=webbrowser.get().name
+            except webbrowser.Error:
+                exe=None
+
+        if exe:
+            args=[exe,"--app="+url]
+            if fullScreen: args.append("--start-fullscreen")
+            if tempfile.gettempdir():
+                args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
+            FNULL = open(os.devnull, 'w')
+            self.__instance = subprocess.Popen( args, close_fds=True, stdout=FNULL, stderr=subprocess.STDOUT )
+        else:
+            raise Exception("no browser")
+
+    def wait(self):
+        if self.__instance: return self.__instance.wait()
+
+    def __del__(self):
+        if self.__instance: self.__instance.kill()
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 jar = aiohttp.CookieJar(unsafe=True)
@@ -348,6 +348,8 @@ def exit():         # exit method
     asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
 
     log("exit")
+    if current and current._browser:
+        del current._browser
     os._exit(0)
 
 # WUY routines
@@ -371,10 +373,7 @@ class Base:
     def _run(self,port=DEFAULT_PORT,app=None,log=True):   # start method (app can be True, (width,height), ...)
         global current,application
 
-        try:
-            os.chdir(os.path.split(sys.argv[0])[0])
-        except:
-            pass
+        os.chdir(os.path.split(sys.argv[0])[0])
 
         current=self    # set current !
 
@@ -408,15 +407,11 @@ class Base:
             if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
                 self._size=app
 
-            def runApp(url):
-                ok=openApp(url,app==FULLSCREEN)
-                if not ok:
-                    print("Can't find Chrome on your desktop ;-(")
-                    os._exit(-1)
-
-            t = Thread(target=runApp, args=(url,))
-            t.start()   #TODO: what to do if no browser is launcher ???
-
+            try:
+                current._browser=ChromeApp(url,app==FULLSCREEN)
+            except Exception as e:
+                print("Can't find Chrome on your desktop : %s" % e)
+                sys.exit(-1)
         else:
             host="0.0.0.0"
 
@@ -473,4 +468,5 @@ def start(page="index",port=DEFAULT_PORT,app=None,log=True):
     b._run(port=port,app=app,log=log)
 
 if __name__=="__main__":
-    openApp("https://github.com/manatlan/wuy")
+    ChromeApp("https://github.com/manatlan/wuy").wait()
+

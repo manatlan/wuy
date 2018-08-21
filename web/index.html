@@ -20,6 +20,7 @@ function event(x) {
     <button onclick="wuy.emit('js_event','from JS').then( rep )">send an event to everybody (except me)</button><br/>
     <button onclick="wuy.my_python_exit();window.close()">exit app (server)</button><br/>
     <button onclick="window.close()">exit app (client)</button><br/>
+    <a href="unknown">Quit by redirect to an unknown page</a>
 
     <script>
         wuy.on("js_event", event )
