@@ -28,7 +28,7 @@ import socket
 import tempfile
 from threading import Thread
 
-__version__="0.7.1"
+__version__="0.7.2"
 
 
 DEFAULT_PORT=8080
@@ -160,7 +160,11 @@ async def handleProxy(req): # proxify "/_/<url>" with headers starting with "set
     headers={ k[4:]:v for k,v in req.headers.items() if k.lower().startswith("set-")}
     r=await request( url, data=req.has_body and (await req.text()),headers=headers )
     log(". serve proxy url",url,headers,":",r.status)
-    return web.Response(status=r.status or 0,text=r.content, headers=r.headers)
+    h={"Server":"Wuy Proxified request (%s)"%__version__}
+    for k,v in r.headers.items():
+        if k in ["content-type","date","expires","cache-control"]:
+            h[k]=v
+    return web.Response(status=r.status or 0,text=r.content, headers=h)
 
 async def handleWeb(req): # serve all statics from web folder
     file = path('./web/'+req.match_info.get('path', "index.html"))
