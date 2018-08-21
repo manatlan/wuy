@@ -28,7 +28,7 @@ import socket
 import tempfile
 from threading import Thread
 
-__version__="0.7.2"
+__version__="0.7.3"
 
 
 DEFAULT_PORT=8080
@@ -348,7 +348,7 @@ def exit():         # exit method
     asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
 
     log("exit")
-    sys.exit(0)
+    os._exit(0)
 
 # WUY routines
 #############################################################
