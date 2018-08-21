@@ -88,7 +88,7 @@ def find_chrome_mac():
         return default_dir
 
 class ChromeApp:
-    def __init__(self,url,fullScreen=False):
+    def __init__(self,url,size=None):
         self.__instance=None
 
         if sys.platform[:3] == 'win':
@@ -104,7 +104,7 @@ class ChromeApp:
 
         if exe:
             args=[exe,"--app="+url]
-            if fullScreen: args.append("--start-fullscreen")
+            if size==FULLSCREEN: args.append("--start-fullscreen")
             if tempfile.gettempdir():
                 args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
             self.__instance = subprocess.Popen( args, close_fds=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL )
@@ -118,24 +118,31 @@ class ChromeApp:
         if self.__instance: self.__instance.kill()
 
 ###############################################################
-## works with CefPython3
+## works with CefPython3,screeninfo
 ###############################################################
-# class ChromeApp:
-#     def __init__(self,url,fullScreen=False):
-#         from threading import Thread
-#         def run(url):
-#             from cefpython3 import cefpython as cef
+class ChromeAppCef:
+    def __init__(self,url,size=None):
+        from threading import Thread
+        def run(url):
+            from cefpython3 import cefpython as cef
 
-#             windowInfo = cef.WindowInfo()
-#             windowInfo.SetAsChild(0,[0,0,400,400])
+            windowInfo = cef.WindowInfo()
+            if size==FULLSCREEN:
+                from screeninfo import get_monitors
+                x=get_monitors()[0]
+                windowInfo.SetAsChild(0,[0,0,x.width,x.height])
+            elif type(size)==tuple:
+                windowInfo.SetAsChild(0,[0,0,size[0],size[1]])
 
-#             cef.Initialize()
-#             b=cef.CreateBrowserSync(windowInfo,url=url,window_title="CefPython3")
-#             b.ToggleFullscreen()
-#             cef.MessageLoop()
-#             cef.Shutdown()
-#         t = Thread(target=run, args=(url,))
-#         t.start()         
+            sys.excepthook = cef.ExceptHook
+
+            cef.Initialize()
+            b=cef.CreateBrowserSync(windowInfo,url=url,window_title="CefPython3")
+
+            cef.MessageLoop()
+            cef.Shutdown()
+        t = Thread(target=run, args=(url,))
+        t.start()         
 ###############################################################
 
 
@@ -431,7 +438,8 @@ class Base:
                 self._size=app
 
             try:
-                current._browser=ChromeApp(url,app==FULLSCREEN)
+                # current._browser=ChromeAppCef(url,app)    # with CefPython3 !!!
+                current._browser=ChromeApp(url,app)
             except Exception as e:
                 print("Can't find Chrome on your desktop : %s" % e)
                 sys.exit(-1)
