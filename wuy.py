@@ -28,7 +28,7 @@ import socket
 import tempfile
 import subprocess
 
-__version__="0.7.4"
+__version__="0.7.5"
 
 
 DEFAULT_PORT=8080
@@ -116,6 +116,30 @@ class ChromeApp:
 
     def __del__(self):
         if self.__instance: self.__instance.kill()
+
+###############################################################
+## works with CefPython3
+###############################################################
+# class ChromeApp:
+#     def __init__(self,url,fullScreen=False):
+#         from threading import Thread
+#         def run(url):
+#             from cefpython3 import cefpython as cef
+
+#             windowInfo = cef.WindowInfo()
+#             windowInfo.SetAsChild(0,[0,0,400,400])
+
+#             cef.Initialize()
+#             b=cef.CreateBrowserSync(windowInfo,url=url,window_title="CefPython3")
+#             b.ToggleFullscreen()
+#             cef.MessageLoop()
+#             cef.Shutdown()
+#         t = Thread(target=run, args=(url,))
+#         t.start()         
+###############################################################
+
+
+
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 jar = aiohttp.CookieJar(unsafe=True)
@@ -467,5 +491,6 @@ def start(page="index",port=DEFAULT_PORT,app=None,log=True):
     b._run(port=port,app=app,log=log)
 
 if __name__=="__main__":
-    ChromeApp("https://github.com/manatlan/wuy").wait()
+    # ChromeApp("https://github.com/manatlan/wuy").wait()
+    pass
 
