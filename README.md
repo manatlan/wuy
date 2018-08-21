@@ -24,7 +24,9 @@ In all cases : it will be pretty easy to produce/freeze an executable/windows (o
 
 Since 0.6; **wuy** provide a js method to [proxify http requests](https://github.com/manatlan/wuy/blob/master/wiki/proxify.md), to avoid CORS troubles.
 
-It's, a little bit, like [python eel](https://github.com/ChrisKnott/Eel).
+It's, a little bit, the same thing as [python eel](https://github.com/ChrisKnott/Eel).
+
+FYI : You can do the same thing as [cefpython](https://github.com/cztomczak/cefpython), by reusing your local chrome install.
 
 **TODOs**:
 * Write docs & examples
