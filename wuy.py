@@ -29,7 +29,7 @@ import tempfile
 import subprocess
 import platform
 
-__version__="0.7.6"
+__version__="0.7.7"
 
 
 DEFAULT_PORT=8080
@@ -163,9 +163,10 @@ class ChromeAppCef:
             #===---
             def wuyInit(width,height):
                 if size==FULLSCREEN:
-                    b.ToggleFullscreen()    # b.SetBounds(0,0,width,height)
-                ##elif type(size)==tuple:
-                ##    b.SetBounds(0,0,size[0],size[1])    # not win
+                    try:
+                        b.SetBounds(0,0,width,height)    # not win
+                    except:
+                        b.ToggleFullscreen()             # win only
 
             bindings = cef.JavascriptBindings()
             bindings.SetFunction("wuyInit", wuyInit)
