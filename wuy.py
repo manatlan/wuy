@@ -32,10 +32,10 @@ import platform
 __version__="0.7.7"
 """
 cef troubles, to fix (before 0.8 release):
-    - set title don't work on *nix
-    - chain'able broken (app3)
-    - make contextual menu (dev tools) optional
-    - freezing with cef
+    - FIX: set title don't work on *nix (Issue #252)
+    - FIX: chain'able broken (test app3)
+    - EVOL: make contextual menu (dev tools) optional
+    - TEST: freezing with cef
 """
 
 DEFAULT_PORT=8080
