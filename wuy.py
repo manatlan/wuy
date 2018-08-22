@@ -30,7 +30,13 @@ import subprocess
 import platform
 
 __version__="0.7.7"
-
+"""
+cef troubles, to fix (before 0.8 release):
+    - set title don't work on *nix
+    - chain'able broken (app3)
+    - make contextual menu (dev tools) optional
+    - freezing with cef
+"""
 
 DEFAULT_PORT=8080
 
