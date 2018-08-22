@@ -27,8 +27,9 @@ import base64
 import socket
 import tempfile
 import subprocess
+import platform
 
-__version__="0.7.5"
+__version__="0.7.6"
 
 
 DEFAULT_PORT=8080
@@ -107,7 +108,7 @@ class ChromeApp:
             if size==FULLSCREEN: args.append("--start-fullscreen")
             if tempfile.gettempdir():
                 args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
-            self.__instance = subprocess.Popen( args, close_fds=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL )
+            self.__instance = subprocess.Popen( args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL )
         else:
             raise Exception("no browser")
 
@@ -122,28 +123,77 @@ class ChromeApp:
 ###############################################################
 class ChromeAppCef:
     def __init__(self,url,size=None):
-        from threading import Thread
+        import pkgutil
+        assert pkgutil.find_loader("cefpython3"), "cefpython3 not available"
+
         def cefbrowser():
             from cefpython3 import cefpython as cef
+            import ctypes
 
             windowInfo = cef.WindowInfo()
             windowInfo.windowName="CefPython3"
-            if size==FULLSCREEN:
-                from screeninfo import get_monitors
-                x=get_monitors()[0]
-                windowInfo.SetAsChild(0,[0,0,x.width,x.height])
-            elif type(size)==tuple:
-                windowInfo.SetAsChild(0,[0,0,size[0],size[1]])
+            if type(size)==tuple:
+                w,h=size[0],size[1]
+                windowInfo.SetAsChild(0,[0,0,w,h]) # not win
+            else:
+                w,h=None,None
 
             sys.excepthook = cef.ExceptHook
 
-            cef.Initialize()
+            settings = {
+                "product_version": "Wuy/%s"%__version__,
+                "user_agent": "Wuy/%s (%s)"% (__version__,platform.system()),
+                "context_menu": dict(
+                    enabled=True,
+                    navigation=False,
+                    print=False,
+                    view_source=False,
+                    external_browser=False,
+                    devtools=True,
+                )
+            }
+            cef.Initialize(settings,{})
             b=cef.CreateBrowserSync(windowInfo,url=url)
+
+            if platform.system() == "Windows" and w and h:
+                window_handle = b.GetOuterWindowHandle()
+                SWP_NOMOVE = 0x0002 # X,Y ignored with SWP_NOMOVE flag
+                ctypes.windll.user32.SetWindowPos(window_handle, 0, 0, 0, w, h, SWP_NOMOVE)
+
+            #===---
+            def wuyInit(width,height):
+                if size==FULLSCREEN:
+                    b.ToggleFullscreen()    # b.SetBounds(0,0,width,height)
+                ##elif type(size)==tuple:
+                ##    b.SetBounds(0,0,size[0],size[1])    # not win
+
+            bindings = cef.JavascriptBindings()
+            bindings.SetFunction("wuyInit", wuyInit)
+            b.SetJavascriptBindings(bindings)
+
+            b.ExecuteJavascript("wuyInit(window.screen.width,window.screen.height)")
+            #===---
+
+            class WuyClientHandler(object):
+                def OnLoadEnd(self, browser, **_):
+                    pass    # could serve in the future (?)
+
+            class WuyDisplayHandler(object):
+                def OnTitleChange(self, browser, title):
+                    try:
+                        cef.WindowUtils.SetTitle(browser,title)
+                    except AttributeError:
+                        print("**WARNING** : title changed '%s' not work on linux" % title)
+
+            b.SetClientHandler(WuyClientHandler())
+            b.SetClientHandler(WuyDisplayHandler())
+
             cef.MessageLoop()
             cef.Shutdown()
 
+        from threading import Thread
         t = Thread(target=cefbrowser)
-        t.start()         
+        t.start()
 ###############################################################
 
 
@@ -414,7 +464,7 @@ class Base:
 
         page=self._name+".html"
 
-        
+
 
         # create startpage if not present and no docstring
         if self.__doc__ is None:
@@ -502,4 +552,5 @@ def start(page="index",port=DEFAULT_PORT,app=None,log=True):
 if __name__=="__main__":
     # ChromeApp("https://github.com/manatlan/wuy").wait()
     pass
+
 
