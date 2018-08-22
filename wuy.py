@@ -28,7 +28,7 @@ import socket
 import tempfile
 import subprocess
 
-__version__="0.7.5"
+__version__="0.7.6"
 
 
 DEFAULT_PORT=8080
@@ -107,7 +107,7 @@ class ChromeApp:
             if size==FULLSCREEN: args.append("--start-fullscreen")
             if tempfile.gettempdir():
                 args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
-            self.__instance = subprocess.Popen( args, close_fds=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL )
+            self.__instance = subprocess.Popen( args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL )
         else:
             raise Exception("no browser")
 
