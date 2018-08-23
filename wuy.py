@@ -29,7 +29,7 @@ import tempfile
 import subprocess
 import platform
 
-__version__="0.7.7"
+__version__="0.7.8"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -135,6 +135,7 @@ class ChromeAppCef:
         def cefbrowser():
             from cefpython3 import cefpython as cef
             import ctypes
+            isWin = platform.system() == "Windows"
 
             windowInfo = cef.WindowInfo()
             windowInfo.windowName="CefPython3"
@@ -161,7 +162,7 @@ class ChromeAppCef:
             cef.Initialize(settings,{})
             b=cef.CreateBrowserSync(windowInfo,url=url)
 
-            if platform.system() == "Windows" and w and h:
+            if isWin and w and h:
                 window_handle = b.GetOuterWindowHandle()
                 SWP_NOMOVE = 0x0002 # X,Y ignored with SWP_NOMOVE flag
                 ctypes.windll.user32.SetWindowPos(window_handle, 0, 0, 0, w, h, SWP_NOMOVE)
@@ -169,10 +170,10 @@ class ChromeAppCef:
             #===---
             def wuyInit(width,height):
                 if size==FULLSCREEN:
-                    try:
-                        b.SetBounds(0,0,width,height)    # not win
-                    except:
+                    if isWin:
                         b.ToggleFullscreen()             # win only
+                    else:
+                        b.SetBounds(0,0,width,height)    # not win
 
             bindings = cef.JavascriptBindings()
             bindings.SetFunction("wuyInit", wuyInit)
