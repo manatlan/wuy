@@ -17,5 +17,6 @@ Will send an event from the server to the client
 ---
 #### method init()
 Override this method to initialize your needs.
+
 ---
 Like the other mode ; just inherit of this class and declare your rpc method (sync or async style), to let them available in the js side.
