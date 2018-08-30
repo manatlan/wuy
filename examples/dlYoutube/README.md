@@ -1,1 +1,1 @@
-This is a **youtube-db** frontend. It will help you to download youtube video on your local filesystem ;-)
+This is a **youtube-dl** frontend. It will help you to download youtube video on your local filesystem ;-)
