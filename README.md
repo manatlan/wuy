@@ -38,14 +38,14 @@ This is _the hello world_ of **wuy**
 ```python
 import wuy
 
-class alone(wuy.Window):
+class helloWorld(wuy.Window):
     """ <button onclick="wuy.beep()">BEEP</button> """
     size=(100,100)
 
     def beep(self):
         print("\a BEEP !!!")
 
-alone()
+helloWorld()
 ```
 
 ## To Test/Run
