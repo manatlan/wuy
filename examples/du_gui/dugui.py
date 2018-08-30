@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -u
 import wuy,os
 import subprocess
 
@@ -9,7 +9,7 @@ def getSize(path):
     except:
         return 0
 
-class selectAFile(wuy.Window):
+class duGui(wuy.Window):
     """ 
     <style>
         body {font-family:sans-serif;font-size:0.8em;cursor:default !important;white-space: nowrap;}
@@ -69,7 +69,7 @@ class selectAFile(wuy.Window):
 if __name__=="__main__":
     try:
         if subprocess.check_call(["which","du"])==0:
-            selectAFile(log=False, folder=os.path.expanduser("~"))
+            duGui(log=False, folder=os.path.expanduser("~"))
         else:
             raise
     except:
