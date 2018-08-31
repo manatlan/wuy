@@ -29,7 +29,7 @@ import tempfile
 import subprocess
 import platform
 
-__version__="0.7.8"
+__version__="0.7.9"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -48,7 +48,7 @@ try:
     if not getattr( sys, 'frozen', False ): #bypass uvloop in frozen app (wait pyinstaller hook)
         import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-except ModuleNotFoundError:
+except:
     pass
 
 # helpers
@@ -462,7 +462,7 @@ class Base:
     def _run(self,port=DEFAULT_PORT,app=None,log=True):   # start method (app can be True, (width,height), ...)
         global current,application
 
-        os.chdir(os.path.split(sys.argv[0])[0])
+        os.chdir(os.path.split(sys.argv[0])[0] or ".")
 
         current=self    # set current !
 
