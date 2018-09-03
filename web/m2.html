@@ -1,0 +1,15 @@
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script> <!-- With that : it works on IE11 !!! (and other older webbrowser) -->
+<script src="wuy.js"></script>
+
+<b>m2</b> <a href="m1.html">m1</a>
+<form onsubmit="wuy.post( this.txt.value );this.txt.value=''; return false">
+    <input name="txt" placeholder="type something here"/>
+    <input type="submit" value="ok"/>
+</form>
+<div id="txts"></div>
+
+<script>
+    wuy.on("addTxt", function(txt) {
+        document.getElementById("txts").innerHTML+="<li>"+txt+"</li>";
+    })
+</script>

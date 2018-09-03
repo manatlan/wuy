@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
 import sys,wuy,os,tempfile
 
@@ -7,7 +7,6 @@ try:
 except ImportError:
     print("Please, install pyinstaller (pip3 install pyinstaller)")
     sys.exit(-1)
-
 
 class gui(wuy.Window):
     """ 
@@ -21,12 +20,12 @@ class gui(wuy.Window):
     </style>
     <b>Select a py3 file (main wuy script)</b> :
     <div id="output"></div>
-    <form onsubmit="wuy.select( this.path.value, this.inConsole.checked, this.addWeb.checked ); return false">
+    <form onsubmit="this.btn.hidden=true;wuy.select( this.path.value, this.inConsole.checked, this.addWeb.checked ); return false">
         Wuy Script<br/><input name="path" style="width:100%" disabled/><br/>
         <label><input type="checkbox" name="addWeb"> Include its web folder</label><br/>
         <label><input type="checkbox" name="inConsole"> With a output console</label><br/>
         <br/>
-        <input type="submit" value="Build Exe"/>
+        <input type="submit" name="btn" disabled=true value="Build Exe (and look into the console)"/>
     </form>
     <script>
         document.addEventListener('contextmenu', e => e.preventDefault())
@@ -44,7 +43,7 @@ class gui(wuy.Window):
                     d.onclick= function() { list( this.path )}
                 }
                 else
-                    d.onclick= function() { document.forms[0].path.value=this.path }
+                    d.onclick= function() { document.forms[0].btn.disabled=false;document.forms[0].path.value=this.path }
                 o.appendChild(d)
             }
         }
@@ -54,9 +53,6 @@ class gui(wuy.Window):
     """
 
     size=(400,400)
-    path=None
-    addWeb=False
-    inConsole=False
 
     def list(self,path):
         np=lambda x: os.path.realpath(os.path.join(path,x))
@@ -69,9 +65,7 @@ class gui(wuy.Window):
         return ll
 
     def select(self,path,inConsole,addWeb):
-        self.path=path
-        self.inConsole=inConsole
-        self.addWeb=addWeb
+        build(path,inConsole,addWeb)
         self.exit()
 
 def build(path,inConsole=False,addWeb=False):
@@ -95,8 +89,5 @@ def build(path,inConsole=False,addWeb=False):
     print( "PYINSTALLER:",params )
     pyi.run( params )
 
-
 if __name__=="__main__":
-    x=gui(log=False, folder=os.getcwd())
-    if x.path:
-        build( x.path, x.inConsole, x.addWeb )
+    gui(log=True, folder=os.getcwd(),port=9999)

@@ -28,8 +28,10 @@ import socket
 import tempfile
 import subprocess
 import platform
+from urllib.parse import urlparse
+import inspect
 
-__version__="0.7.9"
+__version__="0.8.0"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -41,24 +43,19 @@ cef troubles, to fix (before 0.8 release):
 DEFAULT_PORT=8080
 
 application=None
-current=None    # the current instance of Base
+currents={}     # NEW
+isLog=None
 FULLSCREEN="fullscreen" # const !
 
 try:
     if not getattr( sys, 'frozen', False ): #bypass uvloop in frozen app (wait pyinstaller hook)
         import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-except:
+except ImportError:
     pass
 
 # helpers
 #############################################################
-exposed={}
-def expose( f ):    # decorator !
-    global exposed
-    exposed[f.__name__]=f
-    return f
-
 def isFree(ip,port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -76,8 +73,8 @@ def path(f):
     else:
         return f
 
-def log(*a):
-    if current and current._isLog: print(*a)
+def wlog(*a):
+    if isLog: print(*a)
 
 def find_chrome_win():
     import winreg #TODO: pip3 install winreg
@@ -233,13 +230,13 @@ async def request(url,data=None,headers={}):    # mimic urllib.Request() (GET & 
 # Async aiohttp things (use current)
 #############################################################
 async def wsSend( ws, **kargs ):
-    log("< send:",kargs)
-    await ws.send_str( json.dumps( kargs ) )
+    if not ws.closed:
+        wlog("< send:",kargs)
+        await ws.send_str( json.dumps( kargs ) )    #TODO: should remove ws from list ?
 
 
-async def asEmit(event,args,exceptMe=None):
-    global current
-    for ws in current._clients:
+async def wsBroadcast(instance,event,args,exceptMe=None):
+    for ws in instance._clients:
         if id(ws) != id(exceptMe):
             await wsSend(ws,event=event, args=args )
 
@@ -248,27 +245,45 @@ async def handleProxy(req): # proxify "/_/<url>" with headers starting with "set
     if req.query_string: url=url+"?"+req.query_string
     headers={ k[4:]:v for k,v in req.headers.items() if k.lower().startswith("set-")}
     r=await request( url, data=req.has_body and (await req.text()),headers=headers )
-    log(". serve proxy url",url,headers,":",r.status)
+    wlog(". serve proxy url",url,headers,":",r.status)
     h={"Server":"Wuy Proxified request (%s)"%__version__}
     for k,v in r.headers.items():
         if k in ["content-type","date","expires","cache-control"]:
             h[k]=v
     return web.Response(status=r.status or 0,text=r.content, headers=h)
 
+getname=lambda x: x.rsplit(".",1)[0].replace("/",".")
+
 async def handleWeb(req): # serve all statics from web folder
-    file = path('./web/'+req.match_info.get('path', "index.html"))
-    if current and "/%s."%current._name in file and current.__doc__ is not None:
-        return web.Response(status=200,body='<script src="wuy.js"></script>\n'+current.__doc__,content_type="text/html")
-    elif os.path.isfile(file):
-        log("- serve static file",file)
+    ressource=req.match_info.get('path', "")
+    if ressource=="" or ressource.endswith("/"): ressource+="index.html"
+    if ressource.lower().endswith((".html",".htm")):
+        name=getname(ressource)
+        if name in currents:
+            html=currents[name]._render( os.path.dirname(ressource) )
+            if html: # the instance render its own html, go with it
+                return web.Response(status=200,body='<script src="wuy.js"></script>\n'+html,content_type="text/html")
+
+    # classic serve static file or 404
+    file = path( os.path.join( os.path.dirname(ressource),"web",os.path.basename(ressource)))
+    if os.path.isfile(file):
+        wlog("- serve static file",file)
         return web.FileResponse(file)
     else:
-        log("! 404 on",file)
+        wlog("! 404 on",file)
         return web.Response(status=404,body="file not found")
 
 
 async def handleJs(req): # serve the JS
-    log("- serve wuy.js",current._size and ("(with resize to "+str(current._size)+")") or "")
+    # p=req.match_info.get('path', p)
+    # if p is None:
+    pp=urlparse(req.headers["Referer"]).path[1:] #TODO: what if browser hide its referer ????
+    if pp.endswith("/") or pp=="": pp+="index.html"
+    page=getname(pp)
+    instance=currents[page]
+    # else:
+
+    wlog("- serve wuy.js to",page,instance._size and ("(with resize to "+str(instance._size)+")") or "")
 
     name=os.path.basename(sys.argv[0])
     if "." in name: name=name.split(".")[0]
@@ -279,8 +294,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 },true)
 
 function setupWS( cbCnx ) {
-
-    var ws=new WebSocket( window.location.origin.replace("http","ws")+"/ws" );
+    var url=window.location.origin.replace("http","ws")+"/_ws_%s"
+    var ws=new WebSocket( url );
 
     ws.onmessage = function(evt) {
       var r = JSON.parse(evt.data);
@@ -308,7 +323,7 @@ function setupWS( cbCnx ) {
 var wuy={
     _ws: setupWS( function(ws){wuy._ws = ws; document.dispatchEvent( new CustomEvent("init") )} ),
     on: function( evt, callback ) {     // to register an event on a callback
-        document.addEventListener(evt,function(e) { callback(...e.detail) })
+        document.addEventListener(evt,function(e) { callback.apply(callback,e.detail) })
     },
     emit: function( evt, data) {        // to emit a event to all clients (except me), return a promise when done
         var args=Array.prototype.slice.call(arguments)
@@ -318,7 +333,7 @@ var wuy={
         var cmd={
             command:    method,
             args:       args,
-            uuid:       method+"-"+Math.random().toString(36).substring(2), // stamp the exchange, so the callback can be called back (thru customevent)
+            uuid:       method+"-"+Math.random().toString(36).substring(2), // stamp the exchange, so the callback can be called back (thru customevent),
         };
 
         if(wuy._ws) {
@@ -353,40 +368,46 @@ var wuy={
     },
 };
 """ % (
-        current._size and "window.resizeTo(%s,%s);"%(current._size[0],current._size[1]) or "",
+        instance._size and "window.resizeTo(%s,%s);"%(instance._size[0],instance._size[1]) or "",
         'if(!document.title) document.title="%s";'%name,
-        current._closeIfSocketClose and "window.close()" or "setTimeout( function() {setupWS(cbCnx)}, 1000);"
+        page,
+        instance._closeIfSocketClose and "window.close()" or "setTimeout( function() {setupWS(cbCnx)}, 1000);"
     )
 
-    if current._kwargs:
-        for k,v in current._kwargs.items():
+    if instance._kwargs:
+        for k,v in instance._kwargs.items():
             j64=str(base64.b64encode(bytes(json.dumps(v),"utf8")),"utf8")   # thru b64 to avoid trouble with quotes or strangers chars
             js+="""\nwuy.%s=JSON.parse(atob("%s"));""" % (k,j64)
 
-    for k in current._routes.keys():
+    for k in instance._routes.keys():
         js+="""\nwuy.%s=function(_) {return wuy._call("%s", Array.prototype.slice.call(arguments) )};""" % (k,k)
 
     return web.Response(status=200,text=js)
 
 async def wshandle(req):
-    global current
+    global currents
+    page=req.match_info['page']
+    if page not in currents: return None
+    instance=currents[page]
+
     ws = web.WebSocketResponse()
     await ws.prepare(req)
-    current._clients.append(ws)
+    instance._clients.append(ws)
+    wlog("Socket connected",page,len(instance._clients))
     try:
         async for msg in ws:
             if msg.type == web.WSMsgType.text:
                 try:
                     o=json.loads( msg.data )
-                    log("> RECEPT",o)
+                    wlog("> RECEPT",page,o)
                     if o["command"] == "emit":
                         event, *args = o["args"]
-                        await asEmit( event, args, ws) # emit to everybody except me
+                        await wsBroadcast(instance, event, args, ws) # emit to everybody except me
                         r=dict(result = args)           # but return the same content sended, thru the promise
                     else:
-                        ret=current._routes[o["command"]]( *o["args"] )
+                        ret=instance._routes[o["command"]]( *o["args"] )
                         if ret and asyncio.iscoroutine(ret):
-                            log(". ASync call",o["command"])
+                            wlog(". ASync call",page,o["command"])
 
                             async def waitReturn( coroutine,uuid ):
                                 try:
@@ -415,15 +436,16 @@ async def wshandle(req):
             elif msg.type == web.WSMsgType.close or msg.tp == web.WSMsgType.error:
                 break
     finally:
-        current._clients.remove( ws )
+        wlog("Socket deconnected",page)
+        instance._clients.remove( ws )
 
-    if current._closeIfSocketClose: exit()
+    if instance._closeIfSocketClose: _exit(instance)
     return ws
 
-def emit(event,*args):   # sync version of emit for py side !
-    asyncio.ensure_future( asEmit( event, args) )
+def _emit(instance, event,*args):   # sync version of emit for py side !
+    asyncio.ensure_future( wsBroadcast( instance, event, args) )
 
-def exit():         # exit method
+def _exit(instance=None):         # exit method
     async def handle_exception(task):
         try:
             await task.cancel()
@@ -436,129 +458,140 @@ def exit():         # exit method
     asyncio.get_event_loop().stop()
     asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
 
-    log("exit")
-    if current and current._browser:
-        del current._browser
-    os._exit(0)
+    wlog("exit")
+    if instance and instance._browser:
+        del instance._browser
+    # os._exit(0)
 
 # WUY routines
 #############################################################
 class Base:
     _routes={}
-    _clients=[]
     _closeIfSocketClose=False
-    _isLog=False
     _size=None
     _kwargs={}  # Window/Server only
-    def __init__(self,instance,exposed={}):
-        if isinstance(instance,Base):
-            self._name=instance.__class__.__name__
-            self._routes={n:v for n, v in inspect.getmembers(instance, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self._name in str(v)}  #  TODO: there should be a better way to discover class methos
-        else: # old style (eel)
-            self._name=instance # aka page name
-            self._routes=exposed
 
+    def __init__(self,log=True):
+        global isLog
+        isLog=log
+        pc=os.path.dirname(inspect.getfile(self.__class__))
+        cwd=os.getcwd()
+        if pc and pc!=cwd:
+            pc=os.path.relpath(pc,cwd)    # relpath from here
+            self._name=pc.replace("/",".").replace("\\",".")+"."+self.__class__.__name__
+        else:
+            self._name=self.__class__.__name__
+        self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self.__class__.__name__ in str(v)}  #  TODO: there should be a better way to discover class methos
+        self._clients=[]
 
-    def _run(self,port=DEFAULT_PORT,app=None,log=True):   # start method (app can be True, (width,height), ...)
-        global current,application
-
-        os.chdir(os.path.split(sys.argv[0])[0] or ".")
-
-        current=self    # set current !
-
-        self._isLog=log
-
-        globals()["log"]("Will accept : %s" % ", ".join(self._routes.keys()) )  #TODO: not neat
-
-        page=self._name+".html"
-
-
-
-        # create startpage if not present and no docstring
-        if self.__doc__ is None:
-            startpage=path("./web/"+page)
+    def _render(self,folder="."):  # override this, if you want to do more complex things
+        html= self.__doc__
+        if html is None:
+            # create startpage if not present and no docstring
+            startpage=path(os.path.join(folder,"web",self.__class__.__name__+".html"))
+            print("render",startpage)
             if not os.path.isfile(startpage):
                 if not os.path.isdir(os.path.dirname(startpage)):
                     os.makedirs(os.path.dirname(startpage))
                 with open(startpage,"w+") as fid:
                     fid.write('''<script src="wuy.js"></script>\n''')
                     fid.write('''Hello Wuy'rld ;-)''')
-                print("Create 'web/%s', just edit it" % os.path.basename(startpage))
+                print("Create '%s', just edit it" % startpage)
+        return html
 
-        if app:
-            self._closeIfSocketClose=True
-            host="localhost"
-            if application is None:
-                while not isFree(host,port):
-                    port+=1
-            url = "http://%s:%s/%s?%s"% (host,port,page,uuid.uuid4().hex)
+    @classmethod
+    def _start(cls,host,port,instances,appmode):
+        global application,currents
 
-            if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
-                self._size=app
+        for i in instances: i.init()
+        currents = {i._name:i for i in instances}
 
-            try:
-                # current._browser=ChromeAppCef(url,app)    # with CefPython3 !!!
-                current._browser=ChromeApp(url,app)
-            except Exception as e:
-                print("Can't find Chrome on your desktop : %s" % e)
-                sys.exit(-1)
-        else:
-            host="0.0.0.0"
-
-        self.init()
+        wlog("Will accept : %s" % ["%s: %s" %(k,list(v._routes.keys())) for k,v in currents.items()] )  #TODO: not neat
 
         if application is None:
+            os.chdir(os.path.split(sys.argv[0])[0] or ".")  #TODO: not top
+
             application=web.Application()
             application.add_routes([
-                web.get('/ws',      wshandle),
-                web.get('/wuy.js',  handleJs),
+                web.get('/_ws_{page}',      wshandle),
+                web.get('/{path:.*}wuy.js',  handleJs),
                 web.get('/',        handleWeb),
-                web.get('/{path}',  handleWeb),
+                web.get('/{path:.+}',  handleWeb),
                 web.route("*",'/_/{url:.+}',handleProxy),
             ])
             try:
-                if self._closeIfSocketClose: # app-mode, don't shout "server started,  Running on, ctrl-c"
+                if appmode: # app-mode, don't shout "server started,  Running on, ctrl-c"
                     web.run_app(application,host=host,port=port,print=lambda *a,**k: None)
                 else:
                     web.run_app(application,host=host,port=port)
             except KeyboardInterrupt:
-                exit()
+                _exit()
 
     def emit(self,*a,**k):  # emit available for all
-        emit(*a,**k)
+        _emit(self,*a,**k)
 
-    def init(self):
+    def init(self): #override this to make initializations
         pass
 
 class Window(Base):
     size=True   # or a tuple (wx,wy)
+    _port=None
+
     def __init__(self,port=DEFAULT_PORT,log=True,**kwargs):
-        super().__init__(self)
+        super().__init__(log)
         self.__dict__.update(kwargs)
         self._kwargs=kwargs
-        self._run(app=self.size,port=port,log=log)
+        self._run(port=port)
+
+    def _run(self,port):   # start method (app can be True, (width,height), ...)
+        app=self.size
+
+        self._closeIfSocketClose=True
+        host="localhost"
+        if Window._port is None:
+            while not isFree(host,port): port+=1
+            Window._port=port
+        else:
+            port=Window._port
+
+        url = "http://%s:%s/%s?%s"% (host,port,self._name+".html",uuid.uuid4().hex)
+
+        if type(app)==tuple and len(app)==2:    #it's a size tuple : set it !
+            self._size=app
+
+        try:
+            # self._browser=ChromeAppCef(url,app)    # with CefPython3 !!!
+            self._browser=ChromeApp(url,app)
+        except Exception as e:
+            print("Can't find Chrome on your desktop : %s" % e)
+            sys.exit(-1)
+
+        Base._start(host,port,[self],True)
 
     def exit(self): # exit is available for Window !!
-        exit()
+        _exit(self)
 
 class Server(Base):
-    def __init__(self,port=DEFAULT_PORT,log=True,**kwargs):
-        super().__init__(self)
+    def __init__(self,port=DEFAULT_PORT,log=True,autorun=True,**kwargs):
+        super().__init__(log)
         self.__dict__.update(kwargs)
         self._kwargs=kwargs
-        self._run(app=False,port=port,log=log)
+        if autorun:
+            Base._start("0.0.0.0",port,[self],self._closeIfSocketClose)
 
-
-def start(page="index",port=DEFAULT_PORT,app=None,log=True):
-    """ old style run with exposed methods (like eel)
-            'app' can be True, (width,size) (for window-like(app))
-            'app' can be None, False (for server-like)
-    """
-    b=Base(page,exposed)
-    b._run(port=port,app=app,log=log)
+    @classmethod
+    def run(cls,port=DEFAULT_PORT, log=True,**kwargs):
+        global isLog
+        isLog=log
+        allClasses=globals()[cls.__name__].__subclasses__()
+        instances=[c(autorun=False,**kwargs) for c in allClasses]  #TODO: declare params on instances ?????
+        cls._start("0.0.0.0",port,instances,False)
 
 if __name__=="__main__":
     # ChromeApp("https://github.com/manatlan/wuy").wait()
-    pass
-
+    # pass
+    assert getname("jo")=="jo"
+    assert getname("jo.html")=="jo"
+    assert getname("jim/jo")=="jim.jo"
+    assert getname("jim/jo.html")=="jim.jo"
 

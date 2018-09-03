@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import wuy
 
-# it's the future ... (same as an_app_like_eel.py, but with class app concept)
 
 class index(wuy.Window):    # name the class as the web/<class_name>.html
     size=(300,300)

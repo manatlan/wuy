@@ -76,7 +76,7 @@ Install the lib :
 
 ## See Examples
 
-* [an_app](https://github.com/manatlan/wuy/blob/master/an_app.py) : same as an_app_like_eel.py but in the new fashion
+* [an_app](https://github.com/manatlan/wuy/blob/master/an_app.py) : all kind of tricks
 * [an_app2](https://github.com/manatlan/wuy/blob/master/an_app2.py) : an input box
 * [an_app3](https://github.com/manatlan/wuy/blob/master/an_app3.py) : an alert box with autodeclared js vars (chain'able windows)!
 * [an_app4](https://github.com/manatlan/wuy/blob/master/an_app4.py) : using sync & async rpc calls !

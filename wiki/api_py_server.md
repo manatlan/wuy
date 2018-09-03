@@ -19,4 +19,25 @@ Will send an event from the server to the client
 Override this method to initialize your needs.
 
 ---
+#### classmethod run(port=DEFAULT_PORT, log=True, ** kwargs)
+Will detect automatically all `wuy.Server` inheritances, and will run them together. Same args as the constructor ;-)
+
+Here is an example:
+
+```python
+import wuy
+
+class m1(wuy.Server):    # page m1 interact with this class
+    def post(self,txt):
+        self.emit( "addTxt", "1:"+txt)   # emit an event to all clients (me too !)
+
+class m2(wuy.Server):    # page m2 interact with this class
+    def post(self,txt):
+        self.emit( "addTxt", "2:"+txt)   # emit an event to all clients (me too !)
+
+if __name__=="__main__":
+    wuy.Server.run()
+```
+
+---
 Like the other mode ; just inherit of this class and declare your rpc method (sync or async style), to let them available in the js side.
