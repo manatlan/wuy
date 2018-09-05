@@ -32,7 +32,7 @@ import platform
 from urllib.parse import urlparse
 import inspect
 
-__version__="0.8.1"
+__version__="0.8.2"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -624,10 +624,5 @@ class Server(Base):
         cls._start("0.0.0.0",port,instances,False)
 
 if __name__=="__main__":
-    # ChromeApp("https://github.com/manatlan/wuy").wait()
-    # pass
-    assert getname("jo")=="jo"
-    assert getname("jo.html")=="jo"
-    assert getname("jim/jo")=="jim.jo"
-    assert getname("jim/jo.html")=="jim.jo"
+    pass
 

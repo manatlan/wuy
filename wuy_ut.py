@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-import wuy
+import wuy,sys
+import unittest
+
 
 # Officiel unit tests (more than coverage 80% of code (cef works too), windows-mode only)
 
@@ -120,10 +122,47 @@ class UnitTests(wuy.Window):
         #TODO: test POST too ! (only GET here)
         return (await wuy.request("http://localhost:%s/UnitTests.html" % self._port)).content
 
+class TestWuy(unittest.TestCase):
+
+    def test_isFreePort(self):
+        self.assertFalse(wuy.isFree("localhost",22))    #TODO: ssh only ?
+
+    def test_path(self):
+        self.assertFalse(hasattr(sys,"_MEIPASS"))
+        self.assertEqual(wuy.path("jo"),"jo")
+
+    def test_pathFrozen(self):
+        sys._MEIPASS="kiki"
+        self.assertEqual(wuy.path("jo").replace("\\","/"),"kiki/jo")
+        delattr(sys,"_MEIPASS")
+        self.assertFalse(hasattr(sys,"_MEIPASS"))
+
+    def test_getname(self):
+        self.assertEqual( wuy.getname("jo"),"jo" )
+        self.assertEqual( wuy.getname("jo.html"),"jo" )
+        self.assertEqual( wuy.getname("jim/jo"),"jim.jo" )
+        self.assertEqual( wuy.getname("jim/jo.html"),"jim.jo" )
+
+    def test_a_window(self):
+        global tests
+        tests=[]
+        UnitTests(log=True,val="mémé")
+
+        print("#"*79)
+        for test,libl,info in tests:
+            print( test and "ok:" or "KO:",libl, "" if test is True else info)
+        print("#"*79)
+
+        self.assertEqual( len([ok for ok,*_ in tests if ok]),21)
+
+    # def test_a_windows(self):
+    #     s = 'hello world'
+    #     self.assertEqual(s.split(), ['hello', 'world'])
+    #     # check that s.split fails when the separator is not a string
+    #     with self.assertRaises(TypeError):
+    #         s.split(2)
+
 
 if __name__=="__main__":
-    UnitTests(log=True,val="mémé")
-    print("#"*79)
-    for test,libl,info in tests:
-        print( test and "ok:" or "KO:",libl, "" if test is True else info)
-    print("#"*79)
+    # UnitTests(log=True,val="mémé")
+    unittest.main()
