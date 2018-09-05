@@ -15,6 +15,7 @@
 # #############################################################################
 
 from aiohttp import web
+from multidict import CIMultiDict
 import aiohttp
 import asyncio
 import json,sys,os
@@ -31,7 +32,7 @@ import platform
 from urllib.parse import urlparse
 import inspect
 
-__version__="0.8.0"
+__version__="0.8.1"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -207,21 +208,41 @@ class ChromeAppCef:
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 jar = aiohttp.CookieJar(unsafe=True)
 
+class Request: # just to transform aiohttp.Request in wuy.Request (abstraction)
+    def __init__(self,req):
+        self.method=req.method
+        self.path=req.path
+        self.headers=req.headers
+        self.query=req.rel_url.query
+        #TODO: body/json?
+
 class Response:
-    def __init__(self,status,data=None,headers={}):
+    def __init__(self,status,content,headers=None):
         self.status=status
-        self.headers=dict(headers)
-        self.content=data
+
+        if headers is None:
+            self.headers=CIMultiDict()
+            if content is not None and type(content)==bytes:
+                self.headers["Content-Type"]="application/octet-stream"
+            else:
+                self.headers["Content-Type"]="text/html"
+        else:
+            if type(headers)==str:
+                self.headers=CIMultiDict( [("Content-Type",headers),] )
+            else:
+                self.headers=headers
+
+        self.content=content
 
 async def request(url,data=None,headers={}):    # mimic urllib.Request() (GET & POST only)
     async with aiohttp.ClientSession(cookie_jar=jar) as session:
         try:
             if data:
                 async with session.post(url,data=data,headers=headers,ssl=False) as resp:
-                    return Response(resp.status,await resp.text(), resp.headers)
+                    return Response(resp.status,await resp.text(), headers=resp.headers)
             else:
                 async with session.get(url,headers=headers,ssl=False) as resp:
-                    return Response(resp.status,await resp.text(), resp.headers)
+                    return Response(resp.status,await resp.text(), headers=resp.headers)
         except aiohttp.client_exceptions.ClientConnectorError as e:
             return Response(None,str(e))
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -270,6 +291,18 @@ async def handleWeb(req): # serve all statics from web folder
         wlog("- serve static file",file)
         return web.FileResponse(file)
     else:
+        wreq=Request(req)
+        for name,instance in currents.items():
+            ret=instance.request(wreq)
+            if ret is not None:
+                r = await ret if asyncio.iscoroutine(ret) else ret
+                if r is not None:
+                    if type(r)!=Response:
+                        r=Response(status=200,content=r)
+
+                    wlog("- serve dynamic via",name,r)
+                    return web.Response(status=r.status,body=r.content,headers=r.headers)
+
         wlog("! 404 on",file)
         return web.Response(status=404,body="file not found")
 
@@ -343,10 +376,10 @@ var wuy={
                 document.addEventListener('wuy-'+cmd.uuid, function handler(x) {
                     this.removeEventListener('wuy-'+cmd.uuid, handler);
                     var x=x.detail;
-                    if(x && x.result)
+                    if(x && x.result!==undefined)
                         resolve(x.result)
-                    else if(x && x.error)
-                        resolve(x.error)
+                    else if(x && x.error!==undefined)
+                        reject(x.error)
                 });
             })
         }
@@ -499,6 +532,9 @@ class Base:
                 print("Create '%s', just edit it" % startpage)
         return html
 
+    def request(self,req):
+        pass
+
     @classmethod
     def _start(cls,host,port,instances,appmode):
         global application,currents
@@ -516,8 +552,8 @@ class Base:
                 web.get('/_ws_{page}',      wshandle),
                 web.get('/{path:.*}wuy.js',  handleJs),
                 web.get('/',        handleWeb),
-                web.get('/{path:.+}',  handleWeb),
                 web.route("*",'/_/{url:.+}',handleProxy),
+                web.get('/{path:.+}',  handleWeb),
             ])
             try:
                 if appmode: # app-mode, don't shout "server started,  Running on, ctrl-c"
