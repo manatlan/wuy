@@ -153,7 +153,7 @@ class TestWuy(unittest.TestCase):
             print( test and "ok:" or "KO:",libl, "" if test is True else info)
         print("#"*79)
 
-        self.assertEqual( len([ok for ok,*_ in tests if ok]),21)
+        self.assertEqual( len([ok for ok,*_ in tests if ok]),21)        # 21 tests ok
 
     # def test_a_windows(self):
     #     s = 'hello world'
@@ -164,5 +164,4 @@ class TestWuy(unittest.TestCase):
 
 
 if __name__=="__main__":
-    # UnitTests(log=True,val="mémé")
     unittest.main()
