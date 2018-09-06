@@ -492,12 +492,12 @@ def _exit(instance=None):         # exit method
     asyncio.get_event_loop().stop()
     asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
 
-    wlog("exit")
     if instance and instance._browser:
         del instance._browser
         instance._browser=None
 
     application=None
+    wlog("exit")
 
 # WUY routines
 #############################################################
@@ -624,7 +624,7 @@ class Server(Base):
         global isLog
         isLog=log
         allClasses=globals()[cls.__name__].__subclasses__()
-        instances=[c(autorun=False,**kwargs) for c in allClasses]  #TODO: declare params on instances ?????
+        instances=[c(autorun=False,**kwargs) for c in allClasses]
         cls._start("0.0.0.0",port,instances,False)
 
 if __name__=="__main__":
