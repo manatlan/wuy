@@ -144,7 +144,7 @@ class TestWuy(unittest.TestCase):
         self.assertEqual( wuy.getname("jim/jo"),"jim.jo" )
         self.assertEqual( wuy.getname("jim/jo.html"),"jim.jo" )
 
-    def test_aa_window_render_html(self):
+    def test_a_window_render_html(self):
         class aeff(wuy.Window):
             size=(100,100)
             def init(self):
@@ -157,8 +157,8 @@ class TestWuy(unittest.TestCase):
 
     def test_a_double_window(self):
         class aeff(wuy.Window):
-            size=(100,100)
             "hello"
+            size=(100,100)
             def init(self):
                 asyncio.get_event_loop().call_later(2, self.exit)
 
@@ -169,10 +169,11 @@ class TestWuy(unittest.TestCase):
     #     class saeff(wuy.Server):
     #         "I'm a server"
     #         def init(self):
-    #             # asyncio.get_event_loop().call_later(2, self.exit)
-    #             pass
+    #             asyncio.get_event_loop().call_later(2, self.exit)
 
-    #     saeff()
+    #     b=wuy.ChromeApp("http://localhost:55559/saeff.html",None)
+    #     saeff(port=55559)
+    #     del b
 
 
     def test_a_window(self):
