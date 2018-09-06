@@ -63,6 +63,21 @@ class UnitTests(wuy.Window):
         var content=await wuy.fetch("http://localhost:8080/UnitTests.html").then( x=>x.text())  // need to have FULL URL !
         await wuy.report("Test wuy.fetch", content.includes("wuy.js") ,"")
 
+        try {
+            await wuy.testError()
+            await wuy.report("Test Error", False ,"")
+        }
+        catch(e) {
+            await wuy.report("Test Error", (""+e).includes("division by zero") ,"")
+        }
+        try {
+            await wuy.atestError()
+            await wuy.report("Test async Error", False ,"")
+        }
+        catch(e) {
+            await wuy.report("Test async Error", (""+e).includes("division by zero") ,"")
+        }
+
         window.close()
     });
 
@@ -118,6 +133,14 @@ class UnitTests(wuy.Window):
         self.emit("pyEvent","a","b","c")
         return "ok"
 
+    async def atestError(self):
+        a=12/0
+        return "ok" 
+
+    def testError(self):
+        a=12/0
+        return "ok" 
+
     async def testWuyRequest(self):
         #TODO: test POST too ! (only GET here)
         return (await wuy.request("http://localhost:%s/UnitTests.html" % self._port)).content
@@ -165,16 +188,24 @@ class TestWuy(unittest.TestCase):
         aeff()
         aeff()
 
-    # def test_a_server(self):
-    #     class saeff(wuy.Server):
-    #         "I'm a server"
-    #         def init(self):
-    #             asyncio.get_event_loop().call_later(2, self.exit)
+    def test_a_server(self):
+        class saeff(wuy.Server):
+            "I'm a server"
+            def init(self):
+                asyncio.get_event_loop().call_later(2, self.exit)
+        saeff()
+        self.assertEqual( len(wuy.currents),1)  # there was one instance
 
-    #     b=wuy.ChromeApp("http://localhost:55559/saeff.html",None)
-    #     saeff(port=55559)
-    #     del b
-
+    def test_2_server(self):
+        class saeff1(wuy.Server):
+            "I'm a server, and the quitter"
+            def init(self):
+                asyncio.get_event_loop().call_later(2, self.exit)
+        class saeff2(wuy.Server):
+            "I'm a server, and I will killed by saeff1"
+            pass
+        wuy.Server.run()
+        self.assertEqual( len(wuy.currents),2) # there were 2 instances
 
     def test_a_window(self):
         global tests
@@ -186,7 +217,7 @@ class TestWuy(unittest.TestCase):
             print( test and "ok:" or "KO:",libl, "" if test is True else info)
         print("#"*79)
 
-        self.assertEqual( len([ok for ok,*_ in tests if ok]),21)        # 21 tests ok
+        self.assertEqual( len([ok for ok,*_ in tests if ok]),23)        # 23 tests ok
 
 
     # def test_a_windows(self):

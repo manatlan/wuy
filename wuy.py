@@ -32,7 +32,7 @@ import platform
 from urllib.parse import urlparse
 import inspect
 
-__version__="0.8.3"
+__version__="0.8.4"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -426,7 +426,7 @@ async def wshandle(req):
     ws = web.WebSocketResponse()
     await ws.prepare(req)
     instance._clients.append(ws)
-    wlog("Socket connected",page,len(instance._clients))
+    wlog("Socket connected",page)
     try:
         async for msg in ws:
             if msg.type == web.WSMsgType.text:
@@ -492,7 +492,7 @@ def _exit(instance=None):         # exit method
     asyncio.get_event_loop().stop()
     asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
 
-    if instance and instance._browser:
+    if instance and hasattr(instance,"_browser") and instance._browser:
         del instance._browser
         instance._browser=None
 
