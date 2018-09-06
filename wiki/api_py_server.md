@@ -19,6 +19,10 @@ Will send an event from the server to the client
 Override this method to initialize your needs.
 
 ---
+#### method exit()
+Will exit the server instance
+
+---
 #### classmethod run(port=DEFAULT_PORT, log=True, ** kwargs)
 Will detect automatically all `wuy.Server` inheritances, and will run them together. Same args as the constructor ;-)
 

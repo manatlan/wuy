@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import wuy,sys
+import wuy,sys,asyncio,os
 import unittest
 
 
@@ -144,6 +144,37 @@ class TestWuy(unittest.TestCase):
         self.assertEqual( wuy.getname("jim/jo"),"jim.jo" )
         self.assertEqual( wuy.getname("jim/jo.html"),"jim.jo" )
 
+    def test_aa_window_render_html(self):
+        class aeff(wuy.Window):
+            size=(100,100)
+            def init(self):
+                asyncio.get_event_loop().call_later(2, self.exit)
+
+        if os.path.isfile("web/aeff.html"): os.unlink("web/aeff.html")
+        aeff()
+        self.assertTrue( os.path.isfile("web/aeff.html") )
+        os.unlink("web/aeff.html")
+
+    def test_a_double_window(self):
+        class aeff(wuy.Window):
+            size=(100,100)
+            "hello"
+            def init(self):
+                asyncio.get_event_loop().call_later(2, self.exit)
+
+        aeff()
+        aeff()
+
+    # def test_a_server(self):
+    #     class saeff(wuy.Server):
+    #         "I'm a server"
+    #         def init(self):
+    #             # asyncio.get_event_loop().call_later(2, self.exit)
+    #             pass
+
+    #     saeff()
+
+
     def test_a_window(self):
         global tests
         tests=[]
@@ -155,6 +186,7 @@ class TestWuy(unittest.TestCase):
         print("#"*79)
 
         self.assertEqual( len([ok for ok,*_ in tests if ok]),21)        # 21 tests ok
+
 
     # def test_a_windows(self):
     #     s = 'hello world'

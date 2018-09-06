@@ -32,7 +32,7 @@ import platform
 from urllib.parse import urlparse
 import inspect
 
-__version__="0.8.2"
+__version__="0.8.3"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -479,6 +479,7 @@ def _emit(instance, event,*args):   # sync version of emit for py side !
     asyncio.ensure_future( wsBroadcast( instance, event, args) )
 
 def _exit(instance=None):         # exit method
+    global application
     async def handle_exception(task):
         try:
             await task.cancel()
@@ -494,7 +495,9 @@ def _exit(instance=None):         # exit method
     wlog("exit")
     if instance and instance._browser:
         del instance._browser
-    # os._exit(0)
+        instance._browser=None
+
+    application=None
 
 # WUY routines
 #############################################################
@@ -569,6 +572,9 @@ class Base:
     def init(self): #override this to make initializations
         pass
 
+    def exit(self): # available for ALL !!!
+        _exit(self)
+
 class Window(Base):
     size=True   # or a tuple (wx,wy)
     _port=None
@@ -604,8 +610,6 @@ class Window(Base):
 
         Base._start(host,port,[self],True)
 
-    def exit(self): # exit is available for Window !!
-        _exit(self)
 
 class Server(Base):
     def __init__(self,port=DEFAULT_PORT,log=True,autorun=True,**kwargs):

@@ -8,7 +8,6 @@ Depending of your class inheritance
 | act as | Real GUI (your clients won't see any difference) | Regular Web Server, it's up to you to connect to it with browser of your choice |
 | At open | Open GUI in a managed chrome app | no |
 | At end | Close the window/gui | no end (except ctrl-c on server-side, like a regular server) |
-| Can exit on its own ?| Using self.exit() | no (except ctrl-c on server-side, like a regular server) |
 | If socket brokes | Close the window/app | clients retry to reconnect (like a regular server) |
 | Websocket | Only one (think one client) | as many as clients |
 | Browser | Chrome, in **chrome app mode**. | Any browsers from world wild. But you'll better Need to use the wonderful [polyfill](https://polyfill.io/v2/docs/) to be able to serve old browsers (IE11, etc ...). Because wuy.js use Promise (*)|
