@@ -617,7 +617,7 @@ class Server(Base):
         self.__dict__.update(kwargs)
         self._kwargs=kwargs
         if autorun:
-            Base._start("0.0.0.0",port,[self],self._closeIfSocketClose)
+            Base._start("0.0.0.0",port,[self],False)
 
     @classmethod
     def run(cls,port=DEFAULT_PORT, log=True,**kwargs):
