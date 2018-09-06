@@ -219,6 +219,22 @@ class TestWuy(unittest.TestCase):
 
         self.assertEqual( len([ok for ok,*_ in tests if ok]),23)        # 23 tests ok
 
+    def test_cef_if_present(self):
+        import pkgutil 
+        if pkgutil.find_loader("cefpython3"):
+            try:
+                old=wuy.ChromeApp
+                wuy.ChromeApp=wuy.ChromeAppCef
+
+                global tests
+                tests=[]
+                UnitTests(log=True,val="mémé")
+                self.assertEqual( len([ok for ok,*_ in tests if ok]),23)        # 23 tests ok
+
+            finally:
+                wuy.ChromeApp=old
+        else:
+            print("***WARNING*** : cefpython3 not present, no tests !")
 
     # def test_a_windows(self):
     #     s = 'hello world'
