@@ -308,13 +308,10 @@ async def handleWeb(req): # serve all statics from web folder
 
 
 async def handleJs(req): # serve the JS
-    # p=req.match_info.get('path', p)
-    # if p is None:
     pp=urlparse(req.headers["Referer"]).path[1:] #TODO: what if browser hide its referer ????
     if pp.endswith("/") or pp=="": pp+="index.html"
     page=getname(pp)
     instance=currents[page]
-    # else:
 
     wlog("- serve wuy.js to",page,instance._size and ("(with resize to "+str(instance._size)+")") or "")
 
@@ -525,7 +522,6 @@ class Base:
         if html is None:
             # create startpage if not present and no docstring
             startpage=path(os.path.join(folder,"web",self.__class__.__name__+".html"))
-            print("render",startpage)
             if not os.path.isfile(startpage):
                 if not os.path.isdir(os.path.dirname(startpage)):
                     os.makedirs(os.path.dirname(startpage))
@@ -535,7 +531,7 @@ class Base:
                 print("Create '%s', just edit it" % startpage)
         return html
 
-    def request(self,req):
+    def request(self,req):  #override to hook others web requests
         pass
 
     @classmethod

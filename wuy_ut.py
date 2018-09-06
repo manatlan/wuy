@@ -6,7 +6,7 @@ import unittest
 # Officiel unit tests (more than coverage 80% of code (cef works too), windows-mode only)
 
 tests=[]
-
+JSTEST=23 # there are 'JSTEST' js tests in class vv, to test with app-mode and cefpython3 !
 class UnitTests(wuy.Window):
     """
     <meta charset="utf-8" />
@@ -217,7 +217,7 @@ class TestWuy(unittest.TestCase):
             print( test and "ok:" or "KO:",libl, "" if test is True else info)
         print("#"*79)
 
-        self.assertEqual( len([ok for ok,*_ in tests if ok]),23)        # 23 tests ok
+        self.assertEqual( len([ok for ok,*_ in tests if ok]),JSTEST)        # 23 tests ok
 
     def test_cef_if_present(self):
         import pkgutil 
@@ -229,7 +229,7 @@ class TestWuy(unittest.TestCase):
                 global tests
                 tests=[]
                 UnitTests(log=True,val="mémé")
-                self.assertEqual( len([ok for ok,*_ in tests if ok]),23)        # 23 tests ok
+                self.assertEqual( len([ok for ok,*_ in tests if ok]),JSTEST)        # 23 tests ok
 
             finally:
                 wuy.ChromeApp=old
