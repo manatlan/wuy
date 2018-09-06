@@ -125,7 +125,8 @@ class UnitTests(wuy.Window):
 class TestWuy(unittest.TestCase):
 
     def test_isFreePort(self):
-        self.assertFalse(wuy.isFree("localhost",22))    #TODO: ssh only ?
+        ll=[wuy.isFree("localhost",p) for p in [22,23,445]]
+        self.assertTrue( False in ll)
 
     def test_path(self):
         self.assertFalse(hasattr(sys,"_MEIPASS"))
