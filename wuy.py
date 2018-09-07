@@ -32,7 +32,7 @@ import platform
 from urllib.parse import urlparse
 import inspect
 
-__version__="0.8.4"
+__version__="0.8.5"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -214,7 +214,7 @@ class Request: # just to transform aiohttp.Request in wuy.Request (abstraction)
         self.path=req.path
         self.headers=req.headers
         self.query=req.rel_url.query
-        #TODO: body/json?
+        self.body=None
 
 class Response:
     def __init__(self,status,content,headers=None):
@@ -292,6 +292,11 @@ async def handleWeb(req): # serve all statics from web folder
         return web.FileResponse(file)
     else:
         wreq=Request(req)
+        if req.body_exists: # override body 
+            wreq.body=await req.read()
+        else:
+            wreq.body=None
+
         for name,instance in currents.items():
             ret=instance.request(wreq)
             if ret is not None:
@@ -552,7 +557,7 @@ class Base:
                 web.get('/{path:.*}wuy.js',  handleJs),
                 web.get('/',        handleWeb),
                 web.route("*",'/_/{url:.+}',handleProxy),
-                web.get('/{path:.+}',  handleWeb),
+                web.route("*",'/{path:.+}',  handleWeb),
             ])
             try:
                 if appmode: # app-mode, don't shout "server started,  Running on, ctrl-c"

@@ -10,7 +10,7 @@ def only(f): # decorator to place on tests, to limit usage to only theses ones
     ONLYs.append(f.__name__)
     return f
 
-JSTEST=23 # there are 'JSTEST' js tests in class vv, to test with app-mode and cefpython3 !
+JSTEST=25 # there are 'JSTEST' js tests in class vv, to test with app-mode and cefpython3 !
 class UnitTests(wuy.Window):
     """
     <meta charset="utf-8" />
@@ -61,7 +61,12 @@ class UnitTests(wuy.Window):
         //---------------------------------------------------------
 
         var content=await wuy.testWuyRequest()
-        await wuy.report("Test wuy.request", content.includes("wuy.js") ,"")
+        await wuy.report("Test wuy.request GET", content.includes("wuy.js") ,"")
+
+        var content=await wuy.testWuyRequestPost()
+        await wuy.report("Test wuy.request POST", content.includes("'wuy'") ,"")
+
+        await testBadCall("Test wuy.request Error",()=>wuy.testWuyRequestError() )
 
         var content=await fetch("UnitTests.html").then( x=>x.text())
         await wuy.report("Test classic fetch", content.includes("wuy.js") ,"")
@@ -129,6 +134,8 @@ class UnitTests(wuy.Window):
             return wuy.Response(202,"text body","text/plain")    # text/plain
         elif req.path=="/30":
             return wuy.Response(203,"text body",{"content-type":"text/plain"})
+        if req.path=="/post" and req.method=="POST":
+            return "say hello to '%s'"%req.body   # 200, text/html
 
     def call(self,a,b,c="c"):
         return "%s%s%s" % (a,b,c)
@@ -149,8 +156,13 @@ class UnitTests(wuy.Window):
         return "ok" 
 
     async def testWuyRequest(self):
-        #TODO: test POST too ! (only GET here)
         return (await wuy.request("http://localhost:%s/UnitTests.html" % self._port)).content
+
+    async def testWuyRequestPost(self):
+        return (await wuy.request("http://localhost:%s/post" % self._port,"wuy")).content
+
+    async def testWuyRequestError(self):
+        return await wuy.request("hvfgdfdsgfdsgdf")
 
 def reportJS(ll,txt):
     print("#"*79,txt)
