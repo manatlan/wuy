@@ -294,8 +294,6 @@ async def handleWeb(req): # serve all statics from web folder
         wreq=Request(req)
         if req.body_exists: # override body 
             wreq.body=await req.read()
-        else:
-            wreq.body=None
 
         for name,instance in currents.items():
             ret=instance.request(wreq)
