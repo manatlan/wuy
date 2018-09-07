@@ -14,7 +14,10 @@ JSTEST=23 # there are 'JSTEST' js tests in class vv, to test with app-mode and c
 class UnitTests(wuy.Window):
     """
     <meta charset="utf-8" />
+
+    I am 
     <script>
+    document.write(wuy.iam);
 
     document.addEventListener("init", async function() {
 
@@ -149,6 +152,12 @@ class UnitTests(wuy.Window):
         #TODO: test POST too ! (only GET here)
         return (await wuy.request("http://localhost:%s/UnitTests.html" % self._port)).content
 
+def reportJS(ll,txt):
+    print("#"*79,txt)
+    for test,libl,info in ll:
+        print( test and "ok:" or "KO:",libl, "" if test is True else info)
+    print("#"*79)
+
 class TestWuy(unittest.TestCase):
 
     def test_isFreePort(self):
@@ -213,12 +222,9 @@ class TestWuy(unittest.TestCase):
 
     # @only
     def test_a_window(self):                # <--- main tests here
-        ut=UnitTests(log=True,val="mémé")
+        ut=UnitTests(log=True,val="mémé",iam="local chrome")
 
-        print("#"*79)
-        for test,libl,info in ut.tests:
-            print( test and "ok:" or "KO:",libl, "" if test is True else info)
-        print("#"*79)
+        reportJS(ut.tests,"main tests on local chrome app-mode")
 
         self.assertEqual( len([ok for ok,*_ in ut.tests if ok]),JSTEST)        # 23 tests ok
 
@@ -229,7 +235,8 @@ class TestWuy(unittest.TestCase):
                 old=wuy.ChromeApp
                 wuy.ChromeApp=wuy.ChromeAppCef
 
-                ut=UnitTests(log=True,val="mémé")
+                ut=UnitTests(log=True,val="mémé",iam="cef")
+                reportJS(ut.tests,"main tests with cefpython3")
                 self.assertEqual( len([ok for ok,*_ in ut.tests if ok]),JSTEST)        # 23 tests ok
 
             finally:
