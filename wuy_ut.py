@@ -2,6 +2,10 @@
 import wuy,sys,asyncio,os
 import unittest
 
+ONLYs=[]
+def only(f):
+    ONLYs.append(f.__name__)
+    return f
 
 # Officiel unit tests (more than coverage 80% of code (cef works too), windows-mode only)
 
@@ -63,20 +67,8 @@ class UnitTests(wuy.Window):
         var content=await wuy.fetch("http://localhost:8080/UnitTests.html").then( x=>x.text())  // need to have FULL URL !
         await wuy.report("Test wuy.fetch", content.includes("wuy.js") ,"")
 
-        try {
-            await wuy.testError()
-            await wuy.report("Test Error", False ,"")
-        }
-        catch(e) {
-            await wuy.report("Test Error", (""+e).includes("division by zero") ,"")
-        }
-        try {
-            await wuy.atestError()
-            await wuy.report("Test async Error", False ,"")
-        }
-        catch(e) {
-            await wuy.report("Test async Error", (""+e).includes("division by zero") ,"")
-        }
+        await testDivError("Test error",()=>wuy.testError() );
+        await testDivError("Test async error",()=>wuy.atestError() );
 
         window.close()
     });
@@ -93,11 +85,20 @@ class UnitTests(wuy.Window):
     async function testBadCall(p,cbt) {
         try {
             await cbt()                 // raise an exception !
-            wuy.report(p,false,"")
+            await wuy.report(p,false,"")
         }
         catch(e) {wuy.report(p,true,e)}
     }
 
+    async function testDivError(p,cbt) {
+        try {
+            await cbt()
+            await wuy.report(p, False ,"")
+        }
+        catch(e) {
+            await wuy.report(p, (""+e).includes("division by zero") ,"")
+        }
+    }
 
 
     </script>
@@ -207,6 +208,7 @@ class TestWuy(unittest.TestCase):
         wuy.Server.run()
         self.assertEqual( len(wuy.currents),2) # there were 2 instances
 
+    # @only
     def test_a_window(self):
         global tests
         tests=[]
@@ -245,4 +247,12 @@ class TestWuy(unittest.TestCase):
 
 
 if __name__=="__main__":
-    unittest.main()
+    if ONLYs:
+        print("*** WARNING *** skip some tests !")
+        def load_tests(loader, tests, pattern):
+            suite = unittest.TestSuite()
+            for c in tests._tests:
+                suite.addTests( [t for t in c._tests if t._testMethodName in ONLYs] )
+            return suite
+
+    unittest.main( )
