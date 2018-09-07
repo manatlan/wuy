@@ -2,14 +2,14 @@
 import wuy,sys,asyncio,os
 import unittest
 
+# Officiel unit tests (more than coverage 80% of code (cef works too), windows-mode only)
+#TODO: may block under windows (but each test works independantly) ... should find a solution ! It works as expected unde linux only (mac ?)
+
 ONLYs=[]
-def only(f):
+def only(f): # decorator to place on tests, to limit usage to only theses ones
     ONLYs.append(f.__name__)
     return f
 
-# Officiel unit tests (more than coverage 80% of code (cef works too), windows-mode only)
-
-tests=[]
 JSTEST=23 # there are 'JSTEST' js tests in class vv, to test with app-mode and cefpython3 !
 class UnitTests(wuy.Window):
     """
@@ -106,8 +106,11 @@ class UnitTests(wuy.Window):
     """
     size=(100,100)
 
-    async def report(self,libl,val,info):
-        tests.append( (val,libl,info))
+    def init(self):
+        self.tests=[]
+
+    def report(self,libl,val,info):
+        self.tests.append( (val,libl,info) )
 
     #===========================================================================
     def request(self,req):    # async or not
@@ -181,7 +184,7 @@ class TestWuy(unittest.TestCase):
 
     def test_a_double_window(self):
         class aeff(wuy.Window):
-            "hello"
+            "test double open"
             size=(100,100)
             def init(self):
                 asyncio.get_event_loop().call_later(2, self.exit)
@@ -209,17 +212,15 @@ class TestWuy(unittest.TestCase):
         self.assertEqual( len(wuy.currents),2) # there were 2 instances
 
     # @only
-    def test_a_window(self):
-        global tests
-        tests=[]
-        UnitTests(log=True,val="mémé")
+    def test_a_window(self):                # <--- main tests here
+        ut=UnitTests(log=True,val="mémé")
 
         print("#"*79)
-        for test,libl,info in tests:
+        for test,libl,info in ut.tests:
             print( test and "ok:" or "KO:",libl, "" if test is True else info)
         print("#"*79)
 
-        self.assertEqual( len([ok for ok,*_ in tests if ok]),JSTEST)        # 23 tests ok
+        self.assertEqual( len([ok for ok,*_ in ut.tests if ok]),JSTEST)        # 23 tests ok
 
     def test_cef_if_present(self):
         import pkgutil 
@@ -228,10 +229,8 @@ class TestWuy(unittest.TestCase):
                 old=wuy.ChromeApp
                 wuy.ChromeApp=wuy.ChromeAppCef
 
-                global tests
-                tests=[]
-                UnitTests(log=True,val="mémé")
-                self.assertEqual( len([ok for ok,*_ in tests if ok]),JSTEST)        # 23 tests ok
+                ut=UnitTests(log=True,val="mémé")
+                self.assertEqual( len([ok for ok,*_ in ut.tests if ok]),JSTEST)        # 23 tests ok
 
             finally:
                 wuy.ChromeApp=old
