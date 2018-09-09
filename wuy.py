@@ -31,8 +31,9 @@ import subprocess
 import platform
 from urllib.parse import urlparse
 import inspect
+from datetime import datetime,date
 
-__version__="0.8.5"
+__version__="0.8.5+"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -67,6 +68,11 @@ def isFree(ip,port):
     finally:
         s.close()
 
+def serialize(obj): #json serializator
+    if isinstance(obj,date): return obj.isoformat()
+    if isinstance(obj,datetime): return obj.isoformat()
+    if isinstance(obj,bytes): return str(obj,"utf8")
+    return obj.__dict__
 
 def path(f):
     if hasattr(sys,"_MEIPASS"): # when freezed with pyinstaller ;-)
@@ -253,7 +259,7 @@ async def request(url,data=None,headers={}):    # mimic urllib.Request() (GET & 
 async def wsSend( ws, **kargs ):
     if not ws.closed:
         wlog("< send:",kargs)
-        await ws.send_str( json.dumps( kargs ) )    #TODO: should remove ws from list ?
+        await ws.send_str( json.dumps( kargs, default=serialize ) )    #TODO: should remove ws from list ?
 
 
 async def wsBroadcast(instance,event,args,exceptMe=None):
@@ -409,7 +415,7 @@ var wuy={
 
     if instance._kwargs:
         for k,v in instance._kwargs.items():
-            j64=str(base64.b64encode(bytes(json.dumps(v),"utf8")),"utf8")   # thru b64 to avoid trouble with quotes or strangers chars
+            j64=str(base64.b64encode(bytes(json.dumps(v,default=serialize),"utf8")),"utf8")   # thru b64 to avoid trouble with quotes or strangers chars
             js+="""\nwuy.%s=JSON.parse(atob("%s"));""" % (k,j64)
 
     for k in instance._routes.keys():

@@ -4,6 +4,16 @@
     "code-runner.executorMap": {
         "python": "/usr/bin/python3 -u",
     },
-    "python.linting.pylintEnabled": false
+    "python.linting.pylintEnabled": false,
+    "python.unitTest.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "*tests.py"
+    ],
+    "python.unitTest.pyTestEnabled": false,
+    "python.unitTest.nosetestsEnabled": false,
+    "python.unitTest.unittestEnabled": true
 }
 

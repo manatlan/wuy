@@ -192,6 +192,18 @@ class TestWuy(unittest.TestCase):
         self.assertEqual( wuy.getname("jim/jo"),"jim.jo" )
         self.assertEqual( wuy.getname("jim/jo.html"),"jim.jo" )
 
+    def test_json(self):
+        import json
+        from datetime import datetime,date
+        now=datetime.now()
+        dd=date(1983,5,20)
+        a=dict(d=dd,now=now,b=b"kkk")
+        a=json.dumps(a,default=wuy.serialize)
+        a=json.loads(a)
+        self.assertEqual( a["d"],dd.isoformat() )
+        self.assertEqual( a["now"],now.isoformat() )
+        self.assertEqual( a["b"],"kkk" )
+
     def test_a_window_render_html(self):
         class aeff(wuy.Window):
             size=(100,100)
