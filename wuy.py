@@ -31,9 +31,10 @@ import subprocess
 import platform
 from urllib.parse import urlparse
 import inspect
+import re
 from datetime import datetime,date
 
-__version__="0.8.5+"
+__version__="0.8.6"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -68,11 +69,32 @@ def isFree(ip,port):
     finally:
         s.close()
 
-def serialize(obj): #json serializator
-    if isinstance(obj,date): return obj.isoformat()
-    if isinstance(obj,datetime): return obj.isoformat()
+def serialize(obj):
+    def toJSDate(d):
+        assert type(d) in [datetime,date]
+        d=datetime(d.year, d.month, d.day,0,0,0,0) if type(d)==date else d
+        return d.isoformat()+"Z"
+
+    if isinstance(obj,(datetime,date)): return toJSDate(obj)
     if isinstance(obj,bytes): return str(obj,"utf8")
     return obj.__dict__
+
+def unserialize(obj):
+    if type(obj)==str:
+        if re.search('^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d+Z$', obj):
+            return datetime.strptime(obj, "%Y-%m-%dT%H:%M:%S.%fZ")
+        elif re.search('^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$', obj):
+            return datetime.strptime(obj, "%Y-%m-%dT%H:%M:%SZ")
+    elif type(obj)==list:
+        return [unserialize(i) for i in obj]
+    return obj
+
+def jDumps(obj):
+    return json.dumps(obj,default=serialize)
+
+
+def jLoads(s):
+    return unserialize( json.loads(s,object_pairs_hook=lambda obj: {k:unserialize(v) for k, v in obj} ) )
 
 def path(f):
     if hasattr(sys,"_MEIPASS"): # when freezed with pyinstaller ;-)
@@ -259,7 +281,7 @@ async def request(url,data=None,headers={}):    # mimic urllib.Request() (GET & 
 async def wsSend( ws, **kargs ):
     if not ws.closed:
         wlog("< send:",kargs)
-        await ws.send_str( json.dumps( kargs, default=serialize ) )    #TODO: should remove ws from list ?
+        await ws.send_str( jDumps( kargs ) )    #TODO: should remove ws from list ?
 
 
 async def wsBroadcast(instance,event,args,exceptMe=None):
@@ -332,12 +354,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
     %s
 },true)
 
+const dateFormat = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z$/;
+
+function reviver(key, value) {
+    if (typeof value === "string" && dateFormat.test(value)) {
+        return new Date(value);
+    }
+    return value;
+}
+
 function setupWS( cbCnx ) {
     var url=window.location.origin.replace("http","ws")+"/_ws_%s"
     var ws=new WebSocket( url );
 
     ws.onmessage = function(evt) {
-      var r = JSON.parse(evt.data);
+      var r = JSON.parse(evt.data, reviver );
       if(r.uuid) // that's a response from call py !
           document.dispatchEvent( new CustomEvent('wuy-'+r.uuid,{ detail: r} ) );
       else if(r.event){ // that's an event from anywhere !
@@ -415,8 +446,8 @@ var wuy={
 
     if instance._kwargs:
         for k,v in instance._kwargs.items():
-            j64=str(base64.b64encode(bytes(json.dumps(v,default=serialize),"utf8")),"utf8")   # thru b64 to avoid trouble with quotes or strangers chars
-            js+="""\nwuy.%s=JSON.parse(atob("%s"));""" % (k,j64)
+            j64=str(base64.b64encode(bytes(jDumps(v),"utf8")),"utf8")   # thru b64 to avoid trouble with quotes or strangers chars
+            js+="""\nwuy.%s=JSON.parse(atob("%s"),reviver);""" % (k,j64)
 
     for k in instance._routes.keys():
         js+="""\nwuy.%s=function(_) {return wuy._call("%s", Array.prototype.slice.call(arguments) )};""" % (k,k)
@@ -437,7 +468,7 @@ async def wshandle(req):
         async for msg in ws:
             if msg.type == web.WSMsgType.text:
                 try:
-                    o=json.loads( msg.data )
+                    o=jLoads( msg.data )
                     wlog("> RECEPT",page,o)
                     if o["command"] == "emit":
                         event, *args = o["args"]

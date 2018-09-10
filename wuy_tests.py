@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import wuy,sys,asyncio,os
+from datetime import date,datetime
 import unittest
 
 # Officiel unit tests (more than coverage 80% of code (cef works too), windows-mode only)
@@ -10,7 +11,7 @@ def only(f): # decorator to place on tests, to limit usage to only theses ones
     ONLYs.append(f.__name__)
     return f
 
-JSTEST=25 # there are 'JSTEST' js tests in class vv, to test with app-mode and cefpython3 !
+JSTEST=26 # there are 'JSTEST' js tests in class vv, to test with app-mode and cefpython3 !
 class UnitTests(wuy.Window):
     """
     <meta charset="utf-8" />
@@ -77,6 +78,10 @@ class UnitTests(wuy.Window):
 
         await testDivError("Test error",()=>wuy.testError() );
         await testDivError("Test async error",()=>wuy.atestError() );
+
+        d=new Date()
+        dd=await wuy.checkDate(d)
+        await wuy.report("Test json date", ""+d == ""+dd ,"")
 
         window.close()
     });
@@ -164,6 +169,10 @@ class UnitTests(wuy.Window):
     async def testWuyRequestError(self):
         return await wuy.request("hvfgdfdsgfdsgdf")
 
+    def checkDate(self,dat):
+        assert type(dat)==datetime
+        return dat
+
 def reportJS(ll,txt):
     print("#"*79,txt)
     for test,libl,info in ll:
@@ -193,16 +202,28 @@ class TestWuy(unittest.TestCase):
         self.assertEqual( wuy.getname("jim/jo.html"),"jim.jo" )
 
     def test_json(self):
-        import json
-        from datetime import datetime,date
-        now=datetime.now()
-        dd=date(1983,5,20)
-        a=dict(d=dd,now=now,b=b"kkk")
-        a=json.dumps(a,default=wuy.serialize)
-        a=json.loads(a)
-        self.assertEqual( a["d"],dd.isoformat() )
-        self.assertEqual( a["now"],now.isoformat() )
-        self.assertEqual( a["b"],"kkk" )
+        def test(j, testType=None):
+            def testSUS(obj,testType=None):
+                s=wuy.jDumps(obj)
+                nobj=wuy.jLoads(s)
+                self.assertEqual( type(nobj), testType )
+
+            testSUS( dict(v=j) ,dict )
+            testSUS( [ j, dict(a=[j]) ] ,list )
+            testSUS( j ,testType)
+
+        class Ob:
+            def __init__(self):
+                self.name="koko"
+
+        test( datetime.now(), datetime)
+        test( date(1983,5,20), datetime )
+        test( b"kkk", str)
+        test( "kkk", str)
+        test( 42, int)
+        test( 4.2, float)
+        test( None, type(None))
+        test( Ob(), dict )
 
     def test_a_window_render_html(self):
         class aeff(wuy.Window):
