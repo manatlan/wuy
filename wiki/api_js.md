@@ -18,7 +18,7 @@ Exactly as window.fetch(), but proxified thru serverside ([learn more](https://g
 
 ---
 #### wuy.--method--( arg1, arg2, ... ) -> Promise
-Call the serverside rpc method defined in your wuy.Window ou wuy.Server. Otherwise, it rejects with the error.
+Call the serverside rpc method defined in your wuy.Window or wuy.Server. Otherwise, it rejects with the error.
 
 ---
 #### event 'init'
