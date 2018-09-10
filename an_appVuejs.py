@@ -7,7 +7,7 @@ class vuejs(wuy.Window):    # name the class as the web/<class_name>.html
     size=(400,200)
 
     def init(self):             #<- special method which is called at the start !
-        self.emit("setTheDate",str(datetime.datetime.now()))
+        self.emit("setTheDate",datetime.datetime.now())
         asyncio.get_event_loop().call_later(1, self.init)
 
     def inc(self,value):
