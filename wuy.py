@@ -34,7 +34,7 @@ import inspect
 import re
 from datetime import datetime,date
 
-__version__="0.8.6"
+__version__="0.8.7"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
