@@ -77,7 +77,10 @@ def serialize(obj):
 
     if isinstance(obj,(datetime,date)): return toJSDate(obj)
     if isinstance(obj,bytes): return str(obj,"utf8")
-    return obj.__dict__
+    if hasattr(obj, "__dict__"):
+        return obj.__dict__
+    else:
+        return str(obj)
 
 def unserialize(obj):
     if type(obj)==str:

@@ -224,6 +224,7 @@ class TestWuy(unittest.TestCase):
         test( 4.2, float)
         test( None, type(None))
         test( Ob(), dict )
+        test( datetime.now()-datetime.now(), str)
 
     def test_a_window_render_html(self):
         class aeff(wuy.Window):
