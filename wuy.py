@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-from aiohttp import web
+from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
 import aiohttp
 import asyncio
@@ -296,7 +296,7 @@ async def handleProxy(req): # proxify "/_/<url>" with headers starting with "set
     url = req.match_info.get("url",None)
     if req.query_string: url=url+"?"+req.query_string
     headers={ k[4:]:v for k,v in req.headers.items() if k.lower().startswith("set-")}
-    r=await request( url, data=req.has_body and (await req.text()),headers=headers )
+    r=await request( url, data=req.can_read_body and (await req.text()),headers=headers )
     wlog(". serve proxy url",url,headers,":",r.status)
     h={"Server":"Wuy Proxified request (%s)"%__version__}
     for k,v in r.headers.items():
@@ -522,6 +522,7 @@ def _exit(instance=None):         # exit method
     global application
     async def handle_exception(task):
         try:
+            # print("*** cancel",task)
             await task.cancel()
         except Exception:
             pass
@@ -539,6 +540,10 @@ def _exit(instance=None):         # exit method
     application=None
     wlog("exit")
 
+# async def on_shutdown(app):
+#     for name,instance in currents.items():
+#         for ws in instance._clients:
+#             await ws.close(code=WSCloseCode.GOING_AWAY,message='Server shutdown')
 # WUY routines
 #############################################################
 class Base:
@@ -597,6 +602,7 @@ class Base:
                 web.route("*",'/_/{url:.+}',handleProxy),
                 web.route("*",'/{path:.+}',  handleWeb),
             ])
+            # application.on_shutdown.append(on_shutdown)
             try:
                 if appmode: # app-mode, don't shout "server started,  Running on, ctrl-c"
                     web.run_app(application,host=host,port=port,print=lambda *a,**k: None)
