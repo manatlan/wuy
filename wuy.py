@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.8.8"
+__version__="0.8.9"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -36,6 +36,7 @@ import inspect
 import re
 from datetime import datetime,date
 
+
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -50,6 +51,7 @@ application=None
 currents={}     # NEW
 isLog=None
 FULLSCREEN="fullscreen" # const !
+PATH=os.path.dirname(os.path.abspath(os.path.realpath(sys.argv[0])))
 
 try:
     if not getattr( sys, 'frozen', False ): #bypass uvloop in frozen app (wait pyinstaller hook)
@@ -104,7 +106,7 @@ def path(f):
     if hasattr(sys,"_MEIPASS"): # when freezed with pyinstaller ;-)
         return os.path.join(sys._MEIPASS,f)
     else:
-        return os.path.join(os.path.split(sys.argv[0])[0] or ".",f)  #TODO: not top
+        return os.path.join(PATH,f)  #TODO: not top
 
 def wlog(*a):
     if isLog: print(*a)
@@ -557,9 +559,8 @@ class Base:
         global isLog
         isLog=log
         pc=os.path.dirname(inspect.getfile(self.__class__))
-        cwd=os.getcwd()
-        if pc and pc!=cwd:
-            pc=os.path.relpath(pc,cwd)    # relpath from here
+        if pc and pc!="." and pc!=PATH:
+            pc=os.path.relpath(pc,PATH)    # relpath from here
             self._name=pc.replace("/",".").replace("\\",".")+"."+self.__class__.__name__
         else:
             self._name=self.__class__.__name__
