@@ -14,6 +14,11 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
+__version__="0.8.7+"
+"""
+better path system !
+"""
+
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
 import aiohttp
@@ -34,7 +39,6 @@ import inspect
 import re
 from datetime import datetime,date
 
-__version__="0.8.7"
 """
 cef troubles, to fix (before 0.8 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -103,7 +107,7 @@ def path(f):
     if hasattr(sys,"_MEIPASS"): # when freezed with pyinstaller ;-)
         return os.path.join(sys._MEIPASS,f)
     else:
-        return f
+        return os.path.join(os.path.split(sys.argv[0])[0] or ".",f)  #TODO: not top
 
 def wlog(*a):
     if isLog: print(*a)
@@ -323,7 +327,7 @@ async def handleWeb(req): # serve all statics from web folder
         return web.FileResponse(file)
     else:
         wreq=Request(req)
-        if req.body_exists: # override body 
+        if req.body_exists: # override body
             wreq.body=await req.read()
 
         for name,instance in currents.items():
@@ -592,7 +596,6 @@ class Base:
         wlog("Will accept : %s" % ["%s: %s" %(k,list(v._routes.keys())) for k,v in currents.items()] )  #TODO: not neat
 
         if application is None:
-            os.chdir(os.path.split(sys.argv[0])[0] or ".")  #TODO: not top
 
             application=web.Application()
             application.add_routes([
@@ -674,4 +677,3 @@ class Server(Base):
 
 if __name__=="__main__":
     pass
-

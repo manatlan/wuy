@@ -187,7 +187,7 @@ class TestWuy(unittest.TestCase):
 
     def test_path(self):
         self.assertFalse(hasattr(sys,"_MEIPASS"))
-        self.assertEqual(wuy.path("jo"),"jo")
+        self.assertEqual(wuy.path("jo"),os.path.join(os.getcwd(),"jo"))
 
     def test_pathFrozen(self):
         sys._MEIPASS="kiki"
