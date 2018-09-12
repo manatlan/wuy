@@ -155,7 +155,7 @@ class ChromeApp:
         if self.__instance: self.__instance.kill()
 
 ###############################################################
-## works with CefPython3,screeninfo
+## works with CefPython3
 ###############################################################
 class ChromeAppCef:
     def __init__(self,url,size=None):
