@@ -14,10 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.8.7+"
-"""
-better path system !
-"""
+__version__="0.8.8"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
