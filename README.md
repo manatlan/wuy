@@ -20,7 +20,7 @@ In **server mode** : it will act as a classical web server ; and you can use as 
 
 [More on window/server differences](https://github.com/manatlan/wuy/blob/master/wiki/diff.md)
 
-In all cases : it will be pretty easy to produce/freeze an executable/windows (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/BUILD.bat). And share your _super python tool_ to the world (wuy comes with [its own freezer (a wuy app !)](https://github.com/manatlan/wuy/tree/master/examples/wuy_freezer))!
+In all cases : it will be pretty easy to produce/freeze an executable (windows/linux/apple) (one file with all html/js embedded), using [pyinstaller/windows](https://github.com/manatlan/wuy/blob/master/BUILD.bat). And share your _super python tool_ to the world (wuy comes with [its own freezer (a wuy app !)](https://github.com/manatlan/wuy/tree/master/examples/wuy_freezer))! And in the future : android !
 
 Since 0.6; **wuy** provide a js method to [proxify http requests](https://github.com/manatlan/wuy/blob/master/wiki/proxify.md), to avoid CORS troubles.
 
