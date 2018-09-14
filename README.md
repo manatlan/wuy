@@ -29,7 +29,7 @@ It's, a little bit, the same thing as [python eel](https://github.com/ChrisKnott
 
 
 **TODOs**:
-* In the future : will use [cefpython3](https://github.com/cztomczak/cefpython) if it's present, else it will use the local chrome installation. (you could choose to force cef/local use) (you can already try ; modify _wuy.py_, replace ChromeApp() by ChromeAppCef())
+* In the future : [cefpython3](https://github.com/cztomczak/cefpython) will be the platform of choice for running wuy app on **android**/iphone (when [cef](https://bitbucket.org/chromiumembedded/cef/issues/1991/add-android-support) and [cefpython3](https://github.com/kivy-garden/garden.cefpython/issues/8) will be ready). Currently **wuy** works with cefpython3, on linux/windows/apple. (you can already try ; modify _wuy.py_, replace ChromeApp() by ChromeAppCef())
 * Write docs & examples
 
 ## The simplest example
