@@ -103,7 +103,7 @@ def jLoads(s):
 
 class JDict:
     def __init__(self,f:str):
-        self.__f=f
+        self.__f=os.path.join(PATH,f)
         try:
             with open(self.__f,"r+") as fid:
                 self.__d=json.load( fid,object_pairs_hook=lambda obj: {k:unserialize(v) for k, v in obj} ) or {}
