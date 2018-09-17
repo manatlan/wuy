@@ -38,7 +38,7 @@ from datetime import datetime,date
 
 
 """
-cef troubles, to fix (before 0.8 release):
+cef troubles, to fix (before 1.0 release):
     - FIX: set title don't work on *nix (Issue #252)
     - FIX: chain'able broken (test app3)
     - EVOL: make contextual menu (dev tools) optional
