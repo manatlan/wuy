@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.8.9"
+__version__="0.8.10"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -146,7 +146,8 @@ class ChromeApp:
             if size==FULLSCREEN: args.append("--start-fullscreen")
             if tempfile.gettempdir():
                 args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
-            self.__instance = subprocess.Popen( args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL )
+            #self.__instance = subprocess.Popen( args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL ) # make troubles on windows (freezd with noconsole don't start)
+            self.__instance = subprocess.Popen( args)
         else:
             raise Exception("no browser")
 
