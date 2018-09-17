@@ -23,6 +23,15 @@ Override this method to initialize your needs.
 Will exit the current instance
 
 ---
+#### set( key, value, file='config.json' )
+Will store the `value` (object) for the `key`(string), in the default `file` (config.json).
+
+---
+#### get( key=None, file='config.json' ) -> Promise
+Will get the value of the `key`, from the default `file` (config.json). If the `key` is unknown, it returns `None`.
+(If the `key` is None ; it will return all that is stored in the default `file` (config.json))
+
+---
 #### attribut size
 Set the size of the window. size can be a tuple (width,height) or None
 

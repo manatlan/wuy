@@ -24,6 +24,8 @@ In all cases : it will be pretty easy to produce/freeze an executable (windows/l
 
 Since 0.6; **wuy** provide a js method to [proxify http requests](https://github.com/manatlan/wuy/blob/master/wiki/proxify.md), to avoid CORS troubles.
 
+Since 0.9; **wuy** provide get/set methods on client/server side to store/retrieve key/value pairs in a json file on serverside.
+
 It's, a little bit, the same thing as [python eel](https://github.com/ChrisKnott/Eel).
 
 

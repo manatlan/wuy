@@ -23,6 +23,15 @@ Override this method to initialize your needs.
 Will exit the server instance
 
 ---
+#### set( key, value, file='config.json' )
+Will store the `value` (object) for the `key`(string), in the default `file` (config.json).
+
+---
+#### get( key=None, file='config.json' ) -> Promise
+Will get the value of the `key`, from the default `file` (config.json). If the `key` is unknown, it returns `None`.
+(If the `key` is None ; it will return all that is stored in the default `file` (config.json))
+
+---
 #### classmethod run(port=DEFAULT_PORT, log=True, ** kwargs)
 Will detect automatically all `wuy.Server` inheritances, and will run them together. Same args as the constructor ;-)
 

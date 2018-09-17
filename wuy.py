@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.8.10"
+__version__="0.9.0"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -98,15 +98,31 @@ def unserialize(obj):
 def jDumps(obj):
     return json.dumps(obj,default=serialize)
 
-
 def jLoads(s):
     return unserialize( json.loads(s,object_pairs_hook=lambda obj: {k:unserialize(v) for k, v in obj} ) )
+
+class JDict:
+    def __init__(self,f:str):
+        self.__f=f
+        try:
+            with open(self.__f,"r+") as fid:
+                self.__d=json.load( fid,object_pairs_hook=lambda obj: {k:unserialize(v) for k, v in obj} ) or {}
+        except FileNotFoundError as e:
+            self.__d={}
+    def set(self,k:str,v):
+        self.__d[ k ]=v
+        self.__save()
+    def get(self,k:str=None):
+        return self.__d.get( k, None ) if k else self.__d
+    def __save(self):
+        with open(self.__f,"w+") as fid:
+            json.dump( self.__d, fid, indent=4,sort_keys=True,default=serialize)
 
 def path(f):
     if hasattr(sys,"_MEIPASS"): # when freezed with pyinstaller ;-)
         return os.path.join(sys._MEIPASS,f)
     else:
-        return os.path.join(PATH,f)  #TODO: not top
+        return os.path.join(PATH,f) 
 
 def wlog(*a):
     if isLog: print(*a)
@@ -566,6 +582,7 @@ class Base:
         else:
             self._name=self.__class__.__name__
         self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self.__class__.__name__ in str(v)}  #  TODO: there should be a better way to discover class methos
+        self._routes.update( dict(set=self.set,get=self.get))
         self._clients=[]
 
     def _render(self,folder="."):  # override this, if you want to do more complex things
@@ -582,8 +599,6 @@ class Base:
                 print("Create '%s', just edit it" % startpage)
         return html
 
-    def request(self,req):  #override to hook others web requests
-        pass
 
     @classmethod
     def _start(cls,host,port,instances,appmode):
@@ -619,8 +634,19 @@ class Base:
     def init(self): #override this to make initializations
         pass
 
+    def request(self,req):  #override to hook others web requests
+        pass
+
     def exit(self): # available for ALL !!!
         _exit(self)
+
+    def set(self,key,value,file="config.json"):
+        c=JDict(file)
+        c.set(key,value)
+
+    def get(self,key=None,file="config.json"):
+        c=JDict(file)
+        return c.get(key)    
 
 class Window(Base):
     size=True   # or a tuple (wx,wy)

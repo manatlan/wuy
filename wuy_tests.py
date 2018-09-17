@@ -11,7 +11,7 @@ def only(f): # decorator to place on tests, to limit usage to only theses ones
     ONLYs.append(f.__name__)
     return f
 
-JSTEST=26 # there are 'JSTEST' js tests in class vv, to test with app-mode and cefpython3 !
+JSTEST=27 # there are 'JSTEST' js tests in class vv, to test with app-mode and cefpython3 !
 class UnitTests(wuy.Window):
     """
     <meta charset="utf-8" />
@@ -79,9 +79,13 @@ class UnitTests(wuy.Window):
         await testDivError("Test error",()=>wuy.testError() );
         await testDivError("Test async error",()=>wuy.atestError() );
 
-        d=new Date()
-        dd=await wuy.checkDate(d)
+        var d=new Date()
+        var dd=await wuy.checkDate(d)
         await wuy.report("Test json date", ""+d == ""+dd ,"")
+
+        await wuy.set("a",d,"test_config.json")
+        var r=await wuy.get("a","test_config.json")
+        await wuy.report("Test config (json date)", ""+d == ""+r ,"")
 
         window.close()
     });
@@ -179,7 +183,13 @@ def reportJS(ll,txt):
         print( test and "ok:" or "KO:",libl, "" if test is True else info)
     print("#"*79)
 
+
 class TestWuy(unittest.TestCase):
+
+    def setUp(self):
+        if os.path.isfile("test_config.json"): os.unlink("test_config.json")
+    def tearDown(self):
+        self.setUp()
 
     def test_isFreePort(self):
         ll=[wuy.isFree("localhost",p) for p in [22,23,445]]

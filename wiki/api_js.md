@@ -17,6 +17,15 @@ Subscribe to an event.
 Exactly as window.fetch(), but proxified thru serverside ([learn more](https://github.com/manatlan/wuy/blob/master/wiki/proxify.md))
 
 ---
+#### wuy.set( key, value, file='config.json' ) -> Promise
+Will store the `value` (object) for the `key`(string), in the default `file` (config.json), on server side.
+
+---
+#### wuy.get( key=null, file='config.json' ) -> Promise
+Will get the value of the `key`, from the default `file` (config.json), from server side. If the `key` is unknown, the promise resolves `null`.
+(If the `key` is null ; it will return all that is stored in the default `file` (config.json), from server side)
+
+---
 #### wuy.--method--( arg1, arg2, ... ) -> Promise
 Call the serverside rpc method defined in your wuy.Window or wuy.Server. Otherwise, it rejects with the error.
 
