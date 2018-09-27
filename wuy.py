@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.0"
+__version__="0.9.1"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -332,7 +332,7 @@ async def handleWeb(req): # serve all statics from web folder
     if ressource.lower().endswith((".html",".htm")):
         name=getname(ressource)
         if name in currents:
-            html=currents[name]._render( os.path.dirname(ressource) )
+            html=currents[name]._render( path(os.path.dirname(ressource)) )
             if html: # the instance render its own html, go with it
                 return web.Response(status=200,body='<script src="wuy.js"></script>\n'+html,content_type="text/html")
 
