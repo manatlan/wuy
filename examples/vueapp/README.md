@@ -9,3 +9,5 @@ pip3 install wuy vbuild
 ```
 
 and start the `app.py` (from its own folder)
+
+Of course; you can freeze (with [pyinstaller](https://www.pyinstaller.org/)) the app, and embbed the ``web`` folders : and you've got an simple standalone GUI executable (powered by [wuy](https://github.com/manatlan/wuy) and [vuejs](https://vuejs.org/)). With some css styles ; yours users won't see any difference.
