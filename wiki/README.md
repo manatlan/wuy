@@ -25,6 +25,8 @@ Edit "web/index.html", like this :
 <button onclick="wuy.myadd(42,13).then( alert )">test</button>
 ```
 
+**Note**: When not using its "own rendering" (`__doc__` style or `_render() override`) ; it's up to you to include `<script src="wuy.js"></script>` (like in this example). When using "own rendering" : **wuy** insert it (at top) if not present.
+
 Edit "web.py", like this :
 
 ```python

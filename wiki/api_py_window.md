@@ -27,7 +27,7 @@ Will exit the current instance
 Will store the `value` (object) for the `key`(string), in the default `file` (config.json).
 
 ---
-#### get( key=None, file='config.json' ) -> Promise
+#### get( key=None, file='config.json' ) -> value
 Will get the value of the `key`, from the default `file` (config.json). If the `key` is unknown, it returns `None`.
 (If the `key` is None ; it will return all that is stored in the default `file` (config.json))
 
