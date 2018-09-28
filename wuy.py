@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.2"
+__version__="0.9.3"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -334,7 +334,10 @@ async def handleWeb(req): # serve all statics from web folder
         if name in currents:
             html=currents[name]._render( path(os.path.dirname(ressource)) )
             if html: # the instance render its own html, go with it
-                return web.Response(status=200,body='<script src="wuy.js"></script>\n'+html,content_type="text/html")
+                if re.findall(r"""<.*script.*src.*=.*['"]wuy.js['"].*>""", html):
+                    return web.Response(status=200,body=html,content_type="text/html")
+                else:
+                    return web.Response(status=200,body='<script src="wuy.js"></script>\n'+html,content_type="text/html")
 
     # classic serve static file or 404
     file = path( os.path.join( os.path.dirname(ressource),"web",os.path.basename(ressource)))
