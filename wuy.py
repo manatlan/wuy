@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.1"
+__version__="0.9.2"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -578,7 +578,10 @@ class Base:
         pc=os.path.dirname(inspect.getfile(self.__class__))
         if pc and pc!="." and pc!=PATH:
             pc=os.path.relpath(pc,PATH)    # relpath from here
-            self._name=pc.replace("/",".").replace("\\",".")+"."+self.__class__.__name__
+            if pc==".":
+                self._name=self.__class__.__name__
+            else:
+                self._name=pc.replace("/",".").replace("\\",".")+"."+self.__class__.__name__
         else:
             self._name=self.__class__.__name__
         self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self.__class__.__name__ in str(v)}  #  TODO: there should be a better way to discover class methos
