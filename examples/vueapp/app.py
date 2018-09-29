@@ -13,7 +13,7 @@ class index(wuy.Window):
             content=fid.read()
         
         # load all vue/sfc components
-        v=sum([vbuild.VBuild(i) for i in glob.glob(os.path.join(path,"web","*.vue"))])
+        v=sum([vbuild.VBuild(i,minify=True) for i in glob.glob(os.path.join(path,"web","*.vue"))])
 
         # and inject them in your template
         return content.replace("<!-- HERE -->",str(v))
