@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.3"
+__version__="0.9.4"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -587,7 +587,8 @@ class Base:
                 self._name=pc.replace("/",".").replace("\\",".")+"."+self.__class__.__name__
         else:
             self._name=self.__class__.__name__
-        self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self.__class__.__name__ in str(v)}  #  TODO: there should be a better way to discover class methos
+        #self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self.__class__.__name__ in str(v)}  #  TODO: there should be a better way to discover class methos
+        self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod)  if not v.__func__.__qualname__.startswith( ("Base.","Window.","Server."))}
         self._routes.update( dict(set=self.set,get=self.get))
         self._clients=[]
 
