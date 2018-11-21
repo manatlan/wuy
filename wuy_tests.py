@@ -247,6 +247,21 @@ class TestWuy(unittest.TestCase):
         self.assertTrue( os.path.isfile("web/aeff.html") )
         os.unlink("web/aeff.html")
 
+    def test_class_inheritance(self):
+        class More:
+            def jo2():
+                pass
+        class saeff(wuy.Server,More):
+            size=(100,100)
+            def init(self):
+                asyncio.get_event_loop().call_later(2, self.exit)
+            def jo1():
+                pass
+
+        x=saeff()
+        self.assertTrue( "jo1" in x._routes.keys())  
+        self.assertTrue( "jo2" in x._routes.keys())  
+
     def test_a_double_window(self):
         class aeff(wuy.Window):
             "test double open"

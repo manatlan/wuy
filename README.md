@@ -85,6 +85,7 @@ Install the lib :
 * [an_app5](https://github.com/manatlan/wuy/blob/master/an_app5.py) : using async aiohttp.get (request content from web) & FULLSCREEN mode
 * [an_app6](https://github.com/manatlan/wuy/blob/master/an_app6.py) : progress bars (async)
 * [an_app7](https://github.com/manatlan/wuy/blob/master/an_app7.py) : html is inside the docstring ! (**SIMPLEST**)
+* [an_app8](https://github.com/manatlan/wuy/blob/master/an_app8.py) : just to show how to organize your code when app's expand.
 * [an_appVuejs](https://github.com/manatlan/wuy/blob/master/an_appVuejs.py) : using a vuejs app (and  a continuous push from server to client)
 * [a_server](https://github.com/manatlan/wuy/blob/master/a_server.py) : a server, tchat service for multiple clients
 
