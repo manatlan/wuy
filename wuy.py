@@ -532,7 +532,7 @@ async def wshandle(req):
             elif msg.type == web.WSMsgType.close or msg.tp == web.WSMsgType.error:
                 break
     finally:
-        wlog("Socket deconnected",page)
+        wlog("Socket disconnected",page)
         instance._clients.remove( ws )
 
     if instance._closeIfSocketClose: _exit(instance)
