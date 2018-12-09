@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.4"
+__version__="0.9.5"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -151,11 +151,12 @@ class ChromeApp:
         elif sys.platform == 'darwin':
             exe=find_chrome_mac()
         else:
-            webbrowser._tryorder=['google-chrome','chrome',"chromium","chromium-browser"]
-            try:
-                exe=webbrowser.get().name
-            except webbrowser.Error:
-                exe=None
+            for i in ["chromium-browser","chromium",'google-chrome','chrome']:
+                try:
+                    exe=webbrowser.get(i).name
+                    break
+                except webbrowser.Error:
+                    exe=None
 
         if exe:
             args=[exe,"--app="+url]

@@ -74,7 +74,7 @@ class UnitTests(wuy.Window):
 
         //TODO: the givent port is arbitary ... change to self._port !
         var content=await wuy.fetch("http://localhost:8080/UnitTests.html").then( x=>x.text())  // need to have FULL URL !
-        await wuy.report("Test wuy.fetch", content.includes("wuy.js") ,"")
+        await wuy.report("Test wuy.fetch", content.indexOf("wuy.js")>0 ,"")
 
         await testDivError("Test error",()=>wuy.testError() );
         await testDivError("Test async error",()=>wuy.atestError() );
