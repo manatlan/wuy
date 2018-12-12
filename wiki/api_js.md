@@ -30,8 +30,9 @@ Will get the value of the `key`, from the default `file` (config.json), from ser
 Call the serverside rpc method defined in your wuy.Window or wuy.Server. Otherwise, it rejects with the error.
 
 ---
-#### event 'init'
-This event is published when the socket is connected, and the magic cant start !. Just declare your subscription with a classic `document.addEventListener("init",function() { /* your code */ })`
+#### wuy.init( callback )
+The safe way to start your app that ensure all is loaded, and the
+socket is connected. It calls the `callback` when it's done !
 
 ---
 By the way, you can access to the variables declared (kwargs) in the constructor of your wuy application.

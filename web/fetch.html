@@ -6,7 +6,7 @@ div {position:fixed;top:10px;right:20px;z-index:2;color:red;font-size:100px;font
 <script>
 var list=[];
 
-document.addEventListener("init",function() { // published when socket is connected !
+wuy.init( function() { // published when socket is connected !
 
     wuy.feed().then( ll=>{
         list=ll;

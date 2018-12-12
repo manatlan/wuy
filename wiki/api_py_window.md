@@ -36,6 +36,11 @@ Will get the value of the `key`, from the default `file` (config.json). If the `
 Set the size of the window. size can be a tuple (width,height) or None
 
 ---
+#### attribut chromeArgs
+Here you can add default arguments to the chrome instance. By default, it's an empty list.
+example : `chromeArgs = ["--no-proxy-server"]`
+
+---
 Like the other mode ; just inherit of this class and declare your rpc method (sync or async style), to let them available in the js side.
 
 

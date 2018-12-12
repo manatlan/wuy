@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.5"
+__version__="0.9.6"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -143,7 +143,7 @@ def find_chrome_mac():
         return default_dir
 
 class ChromeApp:
-    def __init__(self,url,size=None):
+    def __init__(self,url,size=None,chromeArgs=[]):
         self.__instance=None
 
         if sys.platform[:3] == 'win':
@@ -159,7 +159,7 @@ class ChromeApp:
                     exe=None
 
         if exe:
-            args=[exe,"--app="+url]
+            args=[exe,"--app="+url] + chromeArgs
             if size==FULLSCREEN: args.append("--start-fullscreen")
             if tempfile.gettempdir():
                 args.append('--user-data-dir=%s' % os.path.join(tempfile.gettempdir(),".wuyapp"))
@@ -340,8 +340,16 @@ async def handleWeb(req): # serve all statics from web folder
                 else:
                     return web.Response(status=200,body='<script src="wuy.js"></script>\n'+html,content_type="text/html")
 
+    
+    
     # classic serve static file or 404
-    file = path( os.path.join( os.path.dirname(ressource),"web",os.path.basename(ressource)))
+    
+    ## version<=0.9.5
+    ## file = path( os.path.join( os.path.dirname(ressource),"web",os.path.basename(ressource)))
+    
+    ## version>0.9.5
+    file = path( os.path.join( "web",ressource) )               
+    
     if os.path.isfile(file):
         wlog("- serve static file",file)
         return web.FileResponse(file)
@@ -425,6 +433,16 @@ var wuy={
     emit: function( evt, data) {        // to emit a event to all clients (except me), return a promise when done
         var args=Array.prototype.slice.call(arguments)
         return wuy._call("emit", args)
+    },
+    init: function( callback ) {
+        function start() {
+            document.removeEventListener("init", start)
+            callback()
+        }
+        if(wuy._ws.readyState == wuy._ws.OPEN)
+            start()
+        else
+            document.addEventListener("init", start)
     },
     _call: function( method, args ) {
         var cmd={
@@ -588,9 +606,10 @@ class Base:
                 self._name=pc.replace("/",".").replace("\\",".")+"."+self.__class__.__name__
         else:
             self._name=self.__class__.__name__
-        #self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod) if isinstance(v,types.MethodType) and "bound method %s."%self.__class__.__name__ in str(v)}  #  TODO: there should be a better way to discover class methos
+            
         self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod)  if not v.__func__.__qualname__.startswith( ("Base.","Window.","Server."))}
-        self._routes.update( dict(set=self.set,get=self.get))
+        self._routes.update( dict(set=self.set,get=self.get))   # add get/set config methods
+        if "init" in self._routes: del self._routes["init"]     # ensure that a server-side init() is not exposed on client-side
         self._clients=[]
 
     def _render(self,folder="."):  # override this, if you want to do more complex things
@@ -642,7 +661,7 @@ class Base:
     def init(self): #override this to make initializations
         pass
 
-    def request(self,req):  #override to hook others web requests
+    def request(self,req):  #override to hook others web http requests
         pass
 
     def exit(self): # available for ALL !!!
@@ -659,6 +678,7 @@ class Base:
 class Window(Base):
     size=True   # or a tuple (wx,wy)
     _port=None
+    chromeArgs=[]
 
     def __init__(self,port=DEFAULT_PORT,log=True,**kwargs):
         super().__init__(log)
@@ -684,7 +704,7 @@ class Window(Base):
 
         try:
             # self._browser=ChromeAppCef(url,app)    # with CefPython3 !!!
-            self._browser=ChromeApp(url,app)
+            self._browser=ChromeApp(url,app,chromeArgs=self.chromeArgs)
         except Exception as e:
             print("Can't find Chrome on your desktop : %s" % e)
             sys.exit(-1)

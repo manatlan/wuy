@@ -49,7 +49,7 @@ class duGui(wuy.Window):
             }
         }
 
-        document.addEventListener("init", x=>list() );
+        wuy.init( function() {list()} );
     </script>
     """
 

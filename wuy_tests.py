@@ -20,7 +20,7 @@ class UnitTests(wuy.Window):
     <script>
     document.write(wuy.iam);
 
-    document.addEventListener("init", async function() {
+    wuy.init( async function() {
 
         await wuy.report("declared var", wuy.val=="mémé" ,"")
 

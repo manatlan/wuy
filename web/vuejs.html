@@ -8,22 +8,27 @@
 </div>
 
 <script>
-new Vue({
-  el: '#app',
-  data: {
-    val:1,
-    date:"?",
-  },
-  created() {
-    wuy.on("setTheDate", x=>{this.date=x} )
-  },
-  methods: {
-      letsInc() {
-          wuy.inc( this.val ).then( x=>{
-            this.val = x;
-          });
-      },
-  }
+wuy.init( function() {
+
+  new Vue({
+    el: '#app',
+    data: {
+      val:1,
+      date:"?",
+    },
+    created() {
+      wuy.on("setTheDate", x=>{this.date=x} )
+    },
+    methods: {
+        letsInc() {
+            wuy.inc( this.val ).then( x=>{
+              this.val = x;
+            });
+        },
+    }
+  })
+
+
 })
 </script>
 
