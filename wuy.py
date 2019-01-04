@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.8"
+__version__="0.9.11"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -35,6 +35,7 @@ from urllib.parse import urlparse
 import inspect
 import re
 from datetime import datetime,date
+
 
 """
 cef troubles, to fix (before 1.0 release):
@@ -126,7 +127,7 @@ def path(f):
 def wlog(*l):
     if isLog: 
         s=" ".join([str(i) for i in l])
-        if len(s)>100: s=s[:100]+"..."
+        if len(s)>200: s=s[:200]+"..."
         print(s)
 
 def find_chrome_win():
