@@ -91,9 +91,14 @@ Install the lib :
 
 Don't forget to have a look at [real examples](https://github.com/manatlan/wuy/tree/master/examples) too (real apps for real life)
 
-With [wuy.Window](https://github.com/manatlan/wuy/blob/master/wiki/api_py_window.md) for app (which open/manage a chrome window app)
+A big real life app : See [jBrout3](https://github.com/manatlan/jbrout3) (in development), it's the rebirth of the good old py2/gtk app : [jBrout2](https://jbrout.manatlan.com). It use vuejs/vuex for front, and the jbrout's lib to manage photos.
 
-With [wuy.Server](https://github.com/manatlan/wuy/blob/master/wiki/api_py_server.md) for classic http/ws servers
+
+## Doc
+
+Use [wuy.Window](https://github.com/manatlan/wuy/blob/master/wiki/api_py_window.md) for app (which open/manage a chrome window app)
+
+Use [wuy.Server](https://github.com/manatlan/wuy/blob/master/wiki/api_py_server.md) for classic http/ws servers
 
 And client side (javascript), in all cases : use [wuy.js](https://github.com/manatlan/wuy/blob/master/wiki/api_js.md)
 
