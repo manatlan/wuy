@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.6"
+__version__="0.9.7"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -36,7 +36,6 @@ import inspect
 import re
 from datetime import datetime,date
 
-
 """
 cef troubles, to fix (before 1.0 release):
     - FIX: set title don't work on *nix (Issue #252)
@@ -51,7 +50,8 @@ application=None
 currents={}     # NEW
 isLog=None
 FULLSCREEN="fullscreen" # const !
-PATH=os.path.dirname(os.path.abspath(os.path.realpath(sys.argv[0])))
+# PATH=os.path.dirname(os.path.abspath(os.path.realpath(sys.argv[0])))
+PATH=os.path.dirname(__file__)
 
 try:
     if not getattr( sys, 'frozen', False ): #bypass uvloop in frozen app (wait pyinstaller hook)
@@ -124,8 +124,11 @@ def path(f):
     else:
         return os.path.join(PATH,f) 
 
-def wlog(*a):
-    if isLog: print(*a)
+def wlog(*l):
+    if isLog: 
+        s=" ".join([str(i) for i in l])
+        if len(s)>100: s=s[:100]+"..."
+        print(s)
 
 def find_chrome_win():
     import winreg #TODO: pip3 install winreg
