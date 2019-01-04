@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.7"
+__version__="0.9.8"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -50,8 +50,7 @@ application=None
 currents={}     # NEW
 isLog=None
 FULLSCREEN="fullscreen" # const !
-# PATH=os.path.dirname(os.path.abspath(os.path.realpath(sys.argv[0])))
-PATH=os.path.dirname(__file__)
+PATH=os.path.dirname(os.path.abspath(os.path.realpath(sys.argv[0])))
 
 try:
     if not getattr( sys, 'frozen', False ): #bypass uvloop in frozen app (wait pyinstaller hook)
