@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.11"
+__version__="0.9.12"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -600,15 +600,15 @@ class Base:
     def __init__(self,log=True):
         global isLog
         isLog=log
-        pc=os.path.dirname(inspect.getfile(self.__class__))
-        if pc and pc!="." and pc!=PATH:
-            pc=os.path.relpath(pc,PATH)    # relpath from here
-            if pc==".":
-                self._name=self.__class__.__name__
-            else:
-                self._name=pc.replace("/",".").replace("\\",".")+"."+self.__class__.__name__
-        else:
-            self._name=self.__class__.__name__
+        # pc=os.path.dirname(inspect.getfile(self.__class__))
+        # if pc and pc!="." and pc!=PATH:
+        #     pc=os.path.relpath(pc,PATH)    # relpath from here
+        #     if pc==".":
+        #         self._name=self.__class__.__name__
+        #     else:
+        #         self._name=pc.replace("/",".").replace("\\",".")+"."+self.__class__.__name__
+        # else:
+        self._name=self.__class__.__name__
             
         self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod)  if not v.__func__.__qualname__.startswith( ("Base.","Window.","Server."))}
         self._routes.update( dict(set=self.set,get=self.get))   # add get/set config methods
