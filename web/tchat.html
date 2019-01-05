@@ -1,10 +1,12 @@
 <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script> <!-- With that : it works on IE11 !!! (and other older webbrowser) -->
 <script src="wuy.js"></script>
 
+<button style="float:right" onclick="wuy.myexit()">exit server</button>
 <form onsubmit="wuy.post( this.txt.value );this.txt.value=''; return false">
     <input name="txt" placeholder="type something here"/>
     <input type="submit" value="ok"/>
 </form>
+
 <div id="txts"></div>
 
 <script>

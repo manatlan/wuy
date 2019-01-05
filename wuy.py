@@ -14,10 +14,11 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.12"
+__version__="0.9.20"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
+import concurrent
 import aiohttp
 import asyncio
 import json,sys,os
@@ -62,6 +63,8 @@ except ImportError:
 
 # helpers
 #############################################################
+class ExitException(Exception): pass
+
 def isFree(ip,port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -122,10 +125,10 @@ def path(f):
     if hasattr(sys,"_MEIPASS"): # when freezed with pyinstaller ;-)
         return os.path.join(sys._MEIPASS,f)
     else:
-        return os.path.join(PATH,f) 
+        return os.path.join(PATH,f)
 
 def wlog(*l):
-    if isLog: 
+    if isLog:
         s=" ".join([str(i) for i in l])
         if len(s)>200: s=s[:200]+"..."
         print(s)
@@ -343,16 +346,12 @@ async def handleWeb(req): # serve all statics from web folder
                 else:
                     return web.Response(status=200,body='<script src="wuy.js"></script>\n'+html,content_type="text/html")
 
-    
-    
+
+
     # classic serve static file or 404
-    
-    ## version<=0.9.5
-    ## file = path( os.path.join( os.path.dirname(ressource),"web",os.path.basename(ressource)))
-    
-    ## version>0.9.5
-    file = path( os.path.join( "web",ressource) )               
-    
+
+    file = path( os.path.join( "web",ressource) )
+
     if os.path.isfile(file):
         wlog("- serve static file",file)
         return web.FileResponse(file)
@@ -531,6 +530,8 @@ async def wshandle(req):
                                 try:
                                     ret=await coroutine
                                     m=dict(result=ret, uuid=uuid)
+                                except concurrent.futures._base.CancelledError as e:
+                                    m=dict(error="task cancelled", uuid=uuid)
                                 except Exception as e:
                                     m=dict(error=str(e), uuid=uuid)
                                     print("="*40,"in ASync",o["command"])
@@ -542,9 +543,12 @@ async def wshandle(req):
                             continue # don't answer yet (the coroutine will do it)
 
                         r=dict(result = ret )
+                except ExitException as e:
+                    await application.shutdown() # for an_app2 TODO: watch here more !
+                    r=dict(error="Exit Server")
                 except Exception as e:
                     r=dict(error = str(e))
-                    print("="*40,"on Recept",msg.data)
+                    print("="*40,"Exception on Recept",msg.data)
                     print(traceback.format_exc().strip())
                     print("="*79)
 
@@ -557,7 +561,9 @@ async def wshandle(req):
         wlog("Socket disconnected",page)
         instance._clients.remove( ws )
 
-    if instance._closeIfSocketClose: _exit(instance)
+    if instance._closeIfSocketClose: 
+        await application.shutdown()
+        _exit(instance)
     return ws
 
 def _emit(instance, event,*args):   # sync version of emit for py side !
@@ -565,18 +571,6 @@ def _emit(instance, event,*args):   # sync version of emit for py side !
 
 def _exit(instance=None):         # exit method
     global application
-    async def handle_exception(task):
-        try:
-            # print("*** cancel",task)
-            await task.cancel()
-        except Exception:
-            pass
-
-    for task in asyncio.Task.all_tasks():
-        asyncio.ensure_future(handle_exception(task))
-
-    asyncio.get_event_loop().stop()
-    asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
 
     if instance and hasattr(instance,"_browser") and instance._browser:
         del instance._browser
@@ -585,10 +579,12 @@ def _exit(instance=None):         # exit method
     application=None
     wlog("exit")
 
-# async def on_shutdown(app):
-#     for name,instance in currents.items():
-#         for ws in instance._clients:
-#             await ws.close(code=WSCloseCode.GOING_AWAY,message='Server shutdown')
+async def on_shutdown(app):
+    for task in asyncio.all_tasks():
+        task.cancel()
+    
+        
+
 # WUY routines
 #############################################################
 class Base:
@@ -600,16 +596,9 @@ class Base:
     def __init__(self,log=True):
         global isLog
         isLog=log
-        # pc=os.path.dirname(inspect.getfile(self.__class__))
-        # if pc and pc!="." and pc!=PATH:
-        #     pc=os.path.relpath(pc,PATH)    # relpath from here
-        #     if pc==".":
-        #         self._name=self.__class__.__name__
-        #     else:
-        #         self._name=pc.replace("/",".").replace("\\",".")+"."+self.__class__.__name__
-        # else:
+
         self._name=self.__class__.__name__
-            
+
         self._routes={n:v for n, v in inspect.getmembers(self, inspect.ismethod)  if not v.__func__.__qualname__.startswith( ("Base.","Window.","Server."))}
         self._routes.update( dict(set=self.set,get=self.get))   # add get/set config methods
         if "init" in self._routes: del self._routes["init"]     # ensure that a server-side init() is not exposed on client-side
@@ -649,14 +638,19 @@ class Base:
                 web.route("*",'/_/{url:.+}',handleProxy),
                 web.route("*",'/{path:.+}',  handleWeb),
             ])
-            # application.on_shutdown.append(on_shutdown)
+            application.on_shutdown.append(on_shutdown)
             try:
                 if appmode: # app-mode, don't shout "server started,  Running on, ctrl-c"
                     web.run_app(application,host=host,port=port,print=lambda *a,**k: None)
                 else:
                     web.run_app(application,host=host,port=port)
-            except KeyboardInterrupt:
+            except concurrent.futures._base.CancelledError:
+                pass # die silently
+            except RuntimeError:  # for tests stopping loop TODO check
                 _exit()
+
+            asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
+
 
     def emit(self,*a,**k):  # emit available for all
         _emit(self,*a,**k)
@@ -668,7 +662,7 @@ class Base:
         pass
 
     def exit(self): # available for ALL !!!
-        _exit(self)
+        raise ExitException()
 
     def set(self,key,value,file="config.json"):
         c=JDict(file)
@@ -676,7 +670,7 @@ class Base:
 
     def get(self,key=None,file="config.json"):
         c=JDict(file)
-        return c.get(key)    
+        return c.get(key)
 
 class Window(Base):
     size=True   # or a tuple (wx,wy)

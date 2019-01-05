@@ -16,7 +16,7 @@ class UnitTests(wuy.Window):
     """
     <meta charset="utf-8" />
 
-    I am 
+    I am
     <script>
     document.write(wuy.iam);
 
@@ -158,11 +158,11 @@ class UnitTests(wuy.Window):
 
     async def atestError(self):
         a=12/0
-        return "ok" 
+        return "ok"
 
     def testError(self):
         a=12/0
-        return "ok" 
+        return "ok"
 
     async def testWuyRequest(self):
         return (await wuy.request("http://localhost:%s/UnitTests.html" % self._port)).content
@@ -240,7 +240,11 @@ class TestWuy(unittest.TestCase):
         class aeff(wuy.Window):
             size=(100,100)
             def init(self):
-                asyncio.get_event_loop().call_later(2, self.exit)
+                asyncio.ensure_future(self.willQuit())
+
+            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
+                await asyncio.sleep(1)
+                asyncio.get_event_loop().stop()               
 
         if os.path.isfile("web/aeff.html"): os.unlink("web/aeff.html")
         aeff()
@@ -254,20 +258,29 @@ class TestWuy(unittest.TestCase):
         class saeff(wuy.Server,More):
             size=(100,100)
             def init(self):
-                asyncio.get_event_loop().call_later(2, self.exit)
+                asyncio.ensure_future(self.willQuit())
+
+            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
+                await asyncio.sleep(1)
+                asyncio.get_event_loop().stop()               
+
             def jo1():
                 pass
 
         x=saeff()
-        self.assertTrue( "jo1" in x._routes.keys())  
-        self.assertTrue( "jo2" in x._routes.keys())  
+        self.assertTrue( "jo1" in x._routes.keys())
+        self.assertTrue( "jo2" in x._routes.keys())
 
     def test_a_double_window(self):
         class aeff(wuy.Window):
             "test double open"
             size=(100,100)
             def init(self):
-                asyncio.get_event_loop().call_later(2, self.exit)
+                asyncio.ensure_future(self.willQuit())
+
+            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
+                await asyncio.sleep(1)
+                asyncio.get_event_loop().stop()               
 
         aeff()
         aeff()
@@ -276,22 +289,29 @@ class TestWuy(unittest.TestCase):
         class saeff(wuy.Server):
             "I'm a server"
             def init(self):
-                asyncio.get_event_loop().call_later(2, self.exit)
+                asyncio.ensure_future(self.willQuit())
+
+            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
+                await asyncio.sleep(1)
+                asyncio.get_event_loop().stop()       
         saeff()
         self.assertEqual( len(wuy.currents),1)  # there was one instance
 
     def test_2_server(self):
         class saeff1(wuy.Server):
-            "I'm a server, and the quitter"
+            "I'm a server"
             def init(self):
-                asyncio.get_event_loop().call_later(2, self.exit)
+                asyncio.ensure_future(self.willQuit())
+
+            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
+                await asyncio.sleep(1)
+                asyncio.get_event_loop().stop()    
         class saeff2(wuy.Server):
             "I'm a server, and I will killed by saeff1"
             pass
         wuy.Server.run()
         self.assertEqual( len(wuy.currents),2) # there were 2 instances
 
-    # @only
     def test_a_window(self):                # <--- main tests here
         ut=UnitTests(log=True,val="mémé",iam="local chrome")
 
@@ -300,7 +320,7 @@ class TestWuy(unittest.TestCase):
         self.assertEqual( len([ok for ok,*_ in ut.tests if ok]),JSTEST)        # 23 tests ok
 
     def test_cef_if_present(self):
-        import pkgutil 
+        import pkgutil
         if pkgutil.find_loader("cefpython3"):
             try:
                 old=wuy.ChromeApp
@@ -315,13 +335,6 @@ class TestWuy(unittest.TestCase):
         else:
             print("***WARNING*** : cefpython3 not present, no tests !")
 
-    # def test_a_windows(self):
-    #     s = 'hello world'
-    #     self.assertEqual(s.split(), ['hello', 'world'])
-    #     # check that s.split fails when the separator is not a string
-    #     with self.assertRaises(TypeError):
-    #         s.split(2)
-
 
 if __name__=="__main__":
     if ONLYs:
@@ -333,3 +346,4 @@ if __name__=="__main__":
             return suite
 
     unittest.main( )
+
