@@ -240,11 +240,7 @@ class TestWuy(unittest.TestCase):
         class aeff(wuy.Window):
             size=(100,100)
             def init(self):
-                asyncio.ensure_future(self.willQuit())
-
-            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
-                await asyncio.sleep(1)
-                asyncio.get_event_loop().stop()               
+                asyncio.get_event_loop().call_later(2, self.exit)
 
         if os.path.isfile("web/aeff.html"): os.unlink("web/aeff.html")
         aeff()
@@ -258,11 +254,7 @@ class TestWuy(unittest.TestCase):
         class saeff(wuy.Server,More):
             size=(100,100)
             def init(self):
-                asyncio.ensure_future(self.willQuit())
-
-            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
-                await asyncio.sleep(1)
-                asyncio.get_event_loop().stop()               
+                asyncio.get_event_loop().call_later(2, self.exit)          
 
             def jo1():
                 pass
@@ -276,11 +268,7 @@ class TestWuy(unittest.TestCase):
             "test double open"
             size=(100,100)
             def init(self):
-                asyncio.ensure_future(self.willQuit())
-
-            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
-                await asyncio.sleep(1)
-                asyncio.get_event_loop().stop()               
+                asyncio.get_event_loop().call_later(2, self.exit)           
 
         aeff()
         aeff()
@@ -289,11 +277,8 @@ class TestWuy(unittest.TestCase):
         class saeff(wuy.Server):
             "I'm a server"
             def init(self):
-                asyncio.ensure_future(self.willQuit())
-
-            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
-                await asyncio.sleep(1)
-                asyncio.get_event_loop().stop()       
+                asyncio.get_event_loop().call_later(2, self.exit)
+    
         saeff()
         self.assertEqual( len(wuy.currents),1)  # there was one instance
 
@@ -301,11 +286,8 @@ class TestWuy(unittest.TestCase):
         class saeff1(wuy.Server):
             "I'm a server"
             def init(self):
-                asyncio.ensure_future(self.willQuit())
+                asyncio.get_event_loop().call_later(2, self.exit)
 
-            async def willQuit(self):                       #TODO: self.exit() would be better than stopping the loop
-                await asyncio.sleep(1)
-                asyncio.get_event_loop().stop()    
         class saeff2(wuy.Server):
             "I'm a server, and I will killed by saeff1"
             pass

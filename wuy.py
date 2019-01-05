@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.20"
+__version__="0.9.21"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -63,8 +63,6 @@ except ImportError:
 
 # helpers
 #############################################################
-class ExitException(Exception): pass
-
 def isFree(ip,port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -543,9 +541,6 @@ async def wshandle(req):
                             continue # don't answer yet (the coroutine will do it)
 
                         r=dict(result = ret )
-                except ExitException as e:
-                    await application.shutdown() # for an_app2 TODO: watch here more !
-                    r=dict(error="Exit Server")
                 except Exception as e:
                     r=dict(error = str(e))
                     print("="*40,"Exception on Recept",msg.data)
@@ -648,6 +643,8 @@ class Base:
                 pass # die silently
             except RuntimeError:  # for tests stopping loop TODO check
                 _exit()
+            except KeyboardInterrupt:
+                _exit()
 
             asyncio.set_event_loop(asyncio.new_event_loop())    # renew, so multiple start are availables
 
@@ -662,7 +659,7 @@ class Base:
         pass
 
     def exit(self): # available for ALL !!!
-        raise ExitException()
+        asyncio.get_event_loop().stop()   
 
     def set(self,key,value,file="config.json"):
         c=JDict(file)
