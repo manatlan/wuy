@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.21"
+__version__="0.9.22"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -182,7 +182,7 @@ class ChromeApp:
 ## works with CefPython3
 ###############################################################
 class ChromeAppCef:
-    def __init__(self,url,size=None):
+    def __init__(self,url,size=None,chromeArgs=None):   # chromeArgs is not used
         import pkgutil
         assert pkgutil.find_loader("cefpython3"), "cefpython3 not available"
 
