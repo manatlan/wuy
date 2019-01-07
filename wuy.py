@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__="0.9.22"
+__version__="0.9.23"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
@@ -557,7 +557,6 @@ async def wshandle(req):
         instance._clients.remove( ws )
 
     if instance._closeIfSocketClose: 
-        await application.shutdown()
         _exit(instance)
     return ws
 
@@ -567,6 +566,9 @@ def _emit(instance, event,*args):   # sync version of emit for py side !
 def _exit(instance=None):         # exit method
     global application
 
+    if asyncio.get_event_loop().is_running():
+        asyncio.get_event_loop().stop()
+
     if instance and hasattr(instance,"_browser") and instance._browser:
         del instance._browser
         instance._browser=None
@@ -575,9 +577,14 @@ def _exit(instance=None):         # exit method
     wlog("exit")
 
 async def on_shutdown(app):
+    async def handle_exception(task):
+        try:
+            await task.cancel()
+        except Exception:
+            pass
+
     for task in asyncio.all_tasks():
-        task.cancel()
-    
+        asyncio.ensure_future(handle_exception(task))    
         
 
 # WUY routines
@@ -659,7 +666,7 @@ class Base:
         pass
 
     def exit(self): # available for ALL !!!
-        asyncio.get_event_loop().stop()   
+        _exit()
 
     def set(self,key,value,file="config.json"):
         c=JDict(file)
