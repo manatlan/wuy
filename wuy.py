@@ -325,7 +325,7 @@ async def handleProxy(req): # proxify "/_/<url>" with headers starting with "set
     wlog(". serve proxy url",url,headers,":",r.status)
     h={"Server":"Wuy Proxified request (%s)"%__version__}
     for k,v in r.headers.items():
-        if k in ["content-type","date","expires","cache-control"]:
+        if k.lower() in ["content-type","date","expires","cache-control"]:
             h[k]=v
     return web.Response(status=r.status or 0,text=r.content, headers=h)
 
