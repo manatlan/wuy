@@ -88,6 +88,7 @@ Install the lib :
 * [an_app8](https://github.com/manatlan/wuy/blob/master/an_app8.py) : just to show how to organize your code when app's expand.
 * [an_appVuejs](https://github.com/manatlan/wuy/blob/master/an_appVuejs.py) : using a vuejs app (and  a continuous push from server to client)
 * [a_server](https://github.com/manatlan/wuy/blob/master/a_server.py) : a server, tchat service for multiple clients
+* [upload](https://github.com/manatlan/wuy/issues/6#issuecomment-457903563) : a drag'n'drop upload to server example.
 
 Don't forget to have a look at [real examples](https://github.com/manatlan/wuy/tree/master/examples) too (real apps for real life)
 
