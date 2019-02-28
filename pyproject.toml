@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "wuy"
+version = "0.10.0"
+description = "A simple module for making HTML GUI applications with python3/asyncio"
+authors = ["manatlan <manatlan@gmail.com>"]
+#include = ["LICENSE"]
+readme = 'README.md'
+keywords=['gui', 'html', 'javascript', 'electron', "asyncio", "aiohttp", "websocket"]
+homepage = "https://github.com/manatlan/wuy"
+repository = "https://github.com/manatlan/wuy"
+documentation = "https://github.com/manatlan/wuy"
+license="GPL-2.0"
+classifiers = [
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+        "Operating System :: OS Independent",
+        "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[tool.poetry.dependencies]
+python = "^3.6 || ^3.7"
+aiohttp = "^3.5"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+pytest-cov = "^2.6"
+cefpython3 = "^66.0"
+
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

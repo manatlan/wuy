@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 reqman.html
+pip-wheel-metadata/
 SciTE.properties
 # C extensions
 *.so

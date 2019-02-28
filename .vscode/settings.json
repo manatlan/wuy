@@ -1,19 +1,9 @@
 {
     "python.pythonPath": "/usr/bin/python3",
-    "code-runner.clearPreviousOutput": true,
-    "code-runner.executorMap": {
-        "python": "/usr/bin/python3 -u",
-    },
     "python.linting.pylintEnabled": false,
-    "python.unitTest.unittestArgs": [
-        "-v",
-        "-s",
-        ".",
-        "-p",
-        "*tests.py"
-    ],
-    "python.unitTest.pyTestEnabled": false,
+    "python.unitTest.pyTestEnabled": true,
     "python.unitTest.nosetestsEnabled": false,
-    "python.unitTest.unittestEnabled": true
+    "python.unitTest.unittestEnabled": true,
+    "python.formatting.provider": "black"
 }
 
