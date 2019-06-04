@@ -103,4 +103,5 @@ ENV/
 .mypy_cache/
 cc.py
 pypi.txt
-pypi.txt
+.pytest_cache/*
+test_config.json
