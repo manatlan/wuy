@@ -18,8 +18,8 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6 || ^3.7"
-aiohttp = "^3.5"
+python = "^3.5 || ^3.6 || ^3.7"
+aiohttp = "3.0.0b0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"

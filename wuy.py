@@ -744,7 +744,7 @@ class Base:
         if application is None:
 
             application = web.Application()
-            application.add_routes(
+            application.router.add_routes(
                 [
                     web.get("/_ws_{page}", wshandle),
                     web.get("/{path:.*}wuy.js", handleJs),
