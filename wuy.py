@@ -743,16 +743,20 @@ class Base:
 
         if application is None:
 
+            routes = [
+                        web.get("/_ws_{page}", wshandle),
+                        web.get("/{path:.*}wuy.js", handleJs),
+                        web.get("/", handleWeb),
+                        web.route("*", "/_/{url:.+}", handleProxy),
+                        web.route("*", "/{path:.+}", handleWeb),
+                     ]
+
             application = web.Application()
-            application.add_routes(
-                [
-                    web.get("/_ws_{page}", wshandle),
-                    web.get("/{path:.*}wuy.js", handleJs),
-                    web.get("/", handleWeb),
-                    web.route("*", "/_/{url:.+}", handleProxy),
-                    web.route("*", "/{path:.+}", handleWeb),
-                ]
-            )
+            try:
+                application.add_routes(routes)
+            except AttributeError:
+                application.router.add_routes(routes)  # Py3.5 + aiohttp3.0b
+
             application.on_shutdown.append(on_shutdown)
             try:
                 if (
