@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wuy"
-version = "0.10.0"
+version = "0.10.1"
 description = "A simple module for making HTML GUI applications with python3/asyncio"
 authors = ["manatlan <manatlan@gmail.com>"]
 #include = ["LICENSE"]
