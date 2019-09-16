@@ -14,7 +14,7 @@
 # https://github.com/manatlan/wuy
 # #############################################################################
 
-__version__ = "0.10.0"
+__version__ = "0.10.1"
 
 from aiohttp import web, WSCloseCode
 from multidict import CIMultiDict
