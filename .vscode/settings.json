@@ -3,7 +3,11 @@
     "python.linting.pylintEnabled": false,
     "python.testing.pyTestEnabled": true,
     "python.testing.nosetestsEnabled": false,
-    "python.testing.unittestEnabled": true,
-    "python.formatting.provider": "black"
+    "python.testing.unittestEnabled": false,
+    "python.formatting.provider": "black",
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.pytestEnabled": true
 }
 
