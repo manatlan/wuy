@@ -504,7 +504,9 @@ function setupWS( cbCnx ) {
 var wuy={
     _ws: setupWS( function(ws){wuy._ws = ws; document.dispatchEvent( new CustomEvent("init") )} ),
     on: function( evt, callback ) {     // to register an event on a callback
-        document.addEventListener(evt,function(e) { callback.apply(callback,e.detail) })
+        var listener = function(e) { callback.apply(callback,e.detail) }
+        document.addEventListener(evt, listener)
+        return function() { document.removeEventListener(evt, listener) }
     },
     emit: function( evt, data) {        // to emit a event to all clients (except me), return a promise when done
         var args=Array.prototype.slice.call(arguments)
