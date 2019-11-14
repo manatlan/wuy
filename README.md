@@ -1,6 +1,8 @@
 # wuy 
 
-( You should consider [GUY](https://github.com/manatlan/guy) (when available)! )
+----
+**wuy is dead (no more supported)**; You should go to [GUY](https://github.com/manatlan/guy) (it's available !)
+----
 
 If you have made a _super python tool_, and you want to add a GUI but without using qt/gtk/tk/wx/kivy/toga : you are in the right place ! Just re-use the local browser (chrome in app mode) as GUI, drived by **wuy**.
 
